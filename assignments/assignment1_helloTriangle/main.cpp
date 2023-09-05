@@ -105,7 +105,7 @@ int main() {
 		return 1;
 	}
 
-    createShaderProgram(vertexShaderSource, fragmentShaderSource);
+    unsigned int shaderProgram = createShaderProgram(vertexShaderSource, fragmentShaderSource);
 
     unsigned int vao = createVAO(verticies, 3);
 
@@ -113,6 +113,11 @@ int main() {
 		glfwPollEvents();
 		glClearColor(0.5f, 0.0f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
+
+        glUseProgram(shaderProgram);
+        glBindVertexArray(vao);
+        glDrawArrays(GL_TRIANGLES,0,3);
+
 		glfwSwapBuffers(window);
 	}
 	printf("Shutting down...");
