@@ -8,25 +8,31 @@
 const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
-float verticies[9] = {
-		0.0, 0.5, 0.0, //Top
-		0.5, -0.5, 0.0,  //Right
-		-0.5, -0.5, 0.0  //Left
+float verticies[21] = {
+		0.0, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, /*Top*/
+		0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, /*Right*/
+		-0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 1.0 /*Left*/
 };
 
 const char* vertexShaderSource = R"(
     #version 450
     layout(location = 0) in vec3 vPos;
+    layout(location = 1) in vec4 vColor;
+    out vec4 Color;
+    uniform mat3 _RotMatrix;
     void main(){
-    gl_Position = vec4(vPos,1.0);
+        gl_Position = vec4(_RotMatrix * vPos, 1.0);
+        Color = vColor;
     }
 )";
 
 const char* fragmentShaderSource = R"(
     #version 450
+    in vec4 Color;
     out vec4 FragColor;
+    uniform float _Time;
     void main(){
-    FragColor = vec4(1.0);
+        FragColor = Color * abs(sin(_Time));
     }
 )";
 
@@ -34,14 +40,21 @@ unsigned int createVAO(float* vertexData, int numVertices){
     unsigned int vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexData), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticies), vertexData, GL_STATIC_DRAW);
 
     unsigned int vao;
     glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (const void*)0);
+
+    const int NUM_COLORS = 4;
+
+    glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (numVertices + NUM_COLORS), (const void*)0);
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (numVertices + NUM_COLORS), (const void*)(sizeof(float)*3));
+    glEnableVertexAttribArray(1);
+
     return vao;
 }
 
@@ -110,6 +123,19 @@ int main() {
     unsigned int vao = createVAO(verticies, 3);
 
 	while (!glfwWindowShouldClose(window)) {
+        float time = (float)glfwGetTime();
+        int timeLocation = glGetUniformLocation(shaderProgram, "_Time");
+        glUniform1f(timeLocation, time);
+
+        float rotMatrix[9] = {
+                cos(time), 0.0, -sin(time),
+                0.0, 1, 0.0,
+                sin(time), 0.0, cos(time),
+                };
+
+        int matrixLocation = glGetUniformLocation(shaderProgram, "_RotMatrix");
+        glUniformMatrix3fv(matrixLocation, 1, GL_FALSE, rotMatrix);
+
 		glfwPollEvents();
 		glClearColor(0.5f, 0.0f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
