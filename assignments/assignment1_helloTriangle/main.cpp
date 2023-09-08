@@ -5,8 +5,8 @@
 #include <ew/ewMath/ewMath.h>
 #include <GLFW/glfw3.h>
 
-const int SCREEN_WIDTH = 1080;
-const int SCREEN_HEIGHT = 720;
+const int SCREEN_WIDTH = 900;
+const int SCREEN_HEIGHT = 900;
 
 float verticies[21] = {
 		0.0, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, /*Top*/
@@ -43,7 +43,7 @@ unsigned int createVAO(float* vertexData, int numVertices, int length){
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     //Assigns vertices to vertex buffer
-    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(float[length])), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(float)*length), vertexData, GL_STATIC_DRAW);
 
     //Creates vertex array object
     unsigned int vao;
