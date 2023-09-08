@@ -36,14 +36,14 @@ const char* fragmentShaderSource = R"(
     }
 )";
 
-unsigned int createVAO(float* vertexData, int numVertices, int length){
+unsigned int createVAO(float* vertexData, int numVertices, int totatlLength){
 
     //Creates vertex buffer object
     unsigned int vbo;
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     //Assigns vertices to vertex buffer
-    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(float)*length), vertexData, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(sizeof(float)* totatlLength), vertexData, GL_STATIC_DRAW);
 
     //Creates vertex array object
     unsigned int vao;
@@ -53,12 +53,12 @@ unsigned int createVAO(float* vertexData, int numVertices, int length){
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
     //Creates attribute pointer to position
-    glVertexAttribPointer(0, numVertices, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (length / numVertices), (const void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (totatlLength / numVertices), (const void*)0);
     //Enables attribute at location 0;
     glEnableVertexAttribArray(0);
 
     //Creates attribute pointer to color
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (length / numVertices), (const void*)(sizeof(float)*3));
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, static_cast<int>(sizeof(float)) * (totatlLength / numVertices), (const void*)(sizeof(float)*3));
     //Enables attribute at location 1
     glEnableVertexAttribArray(1);
 
