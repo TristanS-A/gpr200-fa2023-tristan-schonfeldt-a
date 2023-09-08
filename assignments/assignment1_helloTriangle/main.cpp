@@ -9,9 +9,9 @@ const int SCREEN_WIDTH = 900;
 const int SCREEN_HEIGHT = 900;
 
 float verticies[21] = {
-		0.0, 0.5, 0.0, 1.0, 0.0, 0.0, 1.0, /*Top*/
-		0.5, -0.5, 0.0, 0.0, 1.0, 0.0, 1.0, /*Right*/
-		-0.5, -0.5, 0.0, 0.0, 0.0, 1.0, 1.0 /*Left*/
+		0.0, 0.5, 0.0, 1.0, 0.5, 0.5, 1.0, /*Top*/
+		0.5, -0.5, 0.0, 0.5, 1.0, 0.5, 1.0, /*Right*/
+		-0.5, -0.5, 0.0, 0.5, 0.5, 1.0, 1.0 /*Left*/
 };
 
 const char* vertexShaderSource = R"(
@@ -32,7 +32,7 @@ const char* fragmentShaderSource = R"(
     out vec4 FragColor;
     uniform float _Time;
     void main(){
-        FragColor = Color * abs(sin(_Time));
+        FragColor = Color * vec4(abs(sin(_Time * 2.1)), abs(sin(_Time * 2.3)), abs(sin(_Time * 2.5)), 1.0);
     }
 )";
 
