@@ -69,7 +69,7 @@ namespace tsa {
         glUniform1i(glGetUniformLocation(m_id, name.c_str()), val);
     }
 
-    void Shader::setFLoat(const std::string &name, float val) const {
+    void Shader::setFloat(const std::string &name, float val) const {
         glUniform1f(glGetUniformLocation(m_id, name.c_str()), val);
     }
 

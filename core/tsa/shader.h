@@ -19,7 +19,7 @@ namespace tsa {
 
         void setInt(const std::string &name, int val) const;
 
-        void setFLoat(const std::string &name, float val) const;
+        void setFloat(const std::string &name, float val) const;
 
         void setVec2(const std::string &name, float x, float y) const;
 
