@@ -25,10 +25,10 @@ const int SCREEN_HEIGHT = 720;
 
 Vertex vertices[4] = {
     //x    y    z    u    v
-    { -0.5, -0.5, 0.0, 0.0, 0.0 }, //Bottom left
-    { 0.5, -0.5, 0.0, 1.0, 0.0 }, //Bottom right
-    { 0.5,  0.5, 0.0, 1.0, 1.0 },  //Top right
-    { -0.5, 0.5, 0.0, 0.0, 1.0 }  //Top left
+    { -1, -1, 0.0, 0.0, 0.0 }, //Bottom left
+    { 1, -1, 0.0, 1.0, 0.0 }, //Bottom right
+    { 1,  1, 0.0, 1.0, 1.0 },  //Top right
+    { -1, 1, 0.0, 0.0, 1.0 }  //Top left
 };
 
 unsigned int indices[6] = {
@@ -80,6 +80,8 @@ int main() {
 		//Set uniforms
 		shader.setVec3(("_Color"), triangleColor[0], triangleColor[1], triangleColor[2]);
 		shader.setFloat(("_Brightness"), triangleBrightness);
+        shader.setFloat("_Time", static_cast<float>(glfwGetTime()));
+        shader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
