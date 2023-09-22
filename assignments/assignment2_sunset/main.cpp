@@ -80,6 +80,10 @@ int main() {
     float regularSkyColor[3] = {0.0,0.7,1.0};
     float nightSkyColorTop[3] = {0.0,0.0,0.0};
     float nightSkyColorBottom[3] = {0.1,0.0,0.1};
+    float sunSpeed = 1.0;
+    float sunRadius = 0.5;
+    float leftWaveSpeed = 2.0;
+    float rightWaveSpeed = 1.5;
 
     //Set initial uniforms
     shader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -100,6 +104,10 @@ int main() {
         shader.setVec3("_RegularSkyColor", regularSkyColor[0], regularSkyColor[1], regularSkyColor[2]);
         shader.setVec3("_NightSkyTop", nightSkyColorTop[0], nightSkyColorTop[1], nightSkyColorTop[2]);
         shader.setVec3("_NightSkyBottom", nightSkyColorBottom[0], nightSkyColorBottom[1], nightSkyColorBottom[2]);
+        shader.setFloat("_SunSpeed", sunSpeed);
+        shader.setFloat("_SunRadius", sunRadius);
+        shader.setFloat("_LeftWaveSpeed", leftWaveSpeed);
+        shader.setFloat("_RightWaveSpeed", rightWaveSpeed);
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
@@ -111,6 +119,10 @@ int main() {
 			ImGui::NewFrame();
 			ImGui::Begin("Settings");
 			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
+            ImGui::DragFloat("Sun Speed", &sunSpeed, 0.5, 0, 10);
+            ImGui::SliderFloat("Sun Radius", &sunRadius, -0.1, 1);
+            ImGui::DragFloat("Left Wave Speed", &leftWaveSpeed, 1, 5);
+            ImGui::DragFloat("Right Wave Speed", &rightWaveSpeed, 1, 5);
             ImGui::ColorEdit3("Left Wave Color", leftWaveBaseColor);
             ImGui::ColorEdit3("Right Wave Color", rightWaveBaseColor);
             ImGui::ColorEdit3("Sun Day Color", sunColorDay);
