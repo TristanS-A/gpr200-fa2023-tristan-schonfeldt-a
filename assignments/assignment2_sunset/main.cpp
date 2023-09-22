@@ -36,8 +36,6 @@ unsigned int indices[6] = {
         2, 3, 0
 };
 
-float triangleColor[3] = { 1.0f, 0.5f, 0.0f };
-float triangleBrightness = 1.0f;
 bool showImGUIDemoWindow = true;
 
 int main() {
@@ -72,16 +70,36 @@ int main() {
 	unsigned int vao = createVAO(vertices, 12, indices, 6);
     glBindVertexArray(vao);
 
+    //Set initial colors
+    float leftWaveBaseColor[3] = {0.0, 0.0, 0.8};
+    float rightWaveBaseColor[3] = {0.0, 0.0, 0.9};
+    float sunColorDay[3] = {1.0, 1.0, 0.4};
+    float sunColorNight[3] = {1.0,0.6,0.1};
+    float sunsetColorTop[3] = {1.0,0.7, 1.0};
+    float sunsetColorBottom[3] = {0.9,0.5,0.1};
+    float regularSkyColor[3] = {0.0,0.7,1.0};
+    float nightSkyColorTop[3] = {0.0,0.0,0.0};
+    float nightSkyColorBottom[3] = {0.1,0.0,0.1};
+
+    //Set initial uniforms
+    shader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		//Set uniforms
-		shader.setVec3(("_Color"), triangleColor[0], triangleColor[1], triangleColor[2]);
-		shader.setFloat(("_Brightness"), triangleBrightness);
+		//Set time uniform
         shader.setFloat("_Time", static_cast<float>(glfwGetTime()));
-        shader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
+        shader.setVec3("_LeftWaveBaseColor", leftWaveBaseColor[0], leftWaveBaseColor[1], leftWaveBaseColor[2]);
+        shader.setVec3("_RightWaveBaseColor", rightWaveBaseColor[0], rightWaveBaseColor[1], rightWaveBaseColor[2]);
+        shader.setVec3("_SunColorDay", sunColorDay[0], sunColorDay[1], sunColorDay[2]);
+        shader.setVec3("_SunColorNight", sunColorNight[0], sunColorNight[1], sunColorNight[2]);
+        shader.setVec3("_SunsetColorTop", sunsetColorTop[0], sunsetColorTop[1], sunsetColorTop[2]);
+        shader.setVec3("_SunsetColorBottom", sunsetColorBottom[0], sunsetColorBottom[1], sunsetColorBottom[2]);
+        shader.setVec3("_RegularSkyColor", regularSkyColor[0], regularSkyColor[1], regularSkyColor[2]);
+        shader.setVec3("_NightSkyTop", nightSkyColorTop[0], nightSkyColorTop[1], nightSkyColorTop[2]);
+        shader.setVec3("_NightSkyBottom", nightSkyColorBottom[0], nightSkyColorBottom[1], nightSkyColorBottom[2]);
 
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
@@ -91,11 +109,19 @@ int main() {
 			ImGui_ImplGlfw_NewFrame();
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
-
 			ImGui::Begin("Settings");
 			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
-			ImGui::ColorEdit3("Color", triangleColor);
-			ImGui::SliderFloat("Brightness", &triangleBrightness, 0.0f, 1.0f);
+            ImGui::ColorEdit3("Left Wave Color", leftWaveBaseColor);
+            ImGui::ColorEdit3("Right Wave Color", rightWaveBaseColor);
+            ImGui::ColorEdit3("Sun Day Color", sunColorDay);
+            ImGui::ColorEdit3("Sun Night Color", sunColorNight);
+            ImGui::ColorEdit3("Sunset Color Top", sunsetColorTop);
+            ImGui::ColorEdit3("Sunset Color Bottom", sunsetColorBottom);
+            ImGui::ColorEdit3("Day Sky Color", regularSkyColor);
+            ImGui::ColorEdit3("Night Sky Color Top", nightSkyColorTop);
+            ImGui::ColorEdit3("Night Sky Color Bottom", nightSkyColorBottom);
+
+
 			ImGui::End();
 			if (showImGUIDemoWindow) {
 				ImGui::ShowDemoWindow(&showImGUIDemoWindow);
