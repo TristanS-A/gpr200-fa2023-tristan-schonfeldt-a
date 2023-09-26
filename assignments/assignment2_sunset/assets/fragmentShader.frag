@@ -68,6 +68,15 @@ void main(){
     //Adds right wave colors to all colors and also makes then darker when the sun is setting
     allColors = mix(allColors, clamp(_RightWaveBaseColor * clamp(sunSinSpeed + 1.0, 0.4, 1.0), vec3(0.0), vec3(1.0)), wavesRight);
 
+    //Adds coconut info
+    float coconut = length(vec2(UV - vec2(-0.8, sin((-_Time - 0.9) * _RightWaveSpeed) * 0.2 - 0.37))) - 0.1;
+
+    //Makes coconut hairy
+    coconut = smoothstep(0.0, 0.05, coconut);
+
+    //Colors coconut
+    allColors = mix(clamp(vec3(0.4, 0.2, 0.1) * clamp(sunSinSpeed + 1.0, 0.4, 1.0), vec3(0.0), vec3(1.0)), allColors, coconut);
+
     // Output all colors to the screen
     FragColor = vec4(allColors,1.0);
 }
