@@ -69,10 +69,10 @@ void main(){
     allColors = mix(allColors, clamp(_RightWaveBaseColor * clamp(sunSinSpeed + 1.0, 0.4, 1.0), vec3(0.0), vec3(1.0)), wavesRight);
 
     //Adds coconut info
-    float coconut = length(vec2(UV - vec2(-0.8, sin((-_Time - 0.9) * _RightWaveSpeed) * 0.2 - 0.37))) - 0.1;
+    float coconut = length(vec2(UV - vec2(-0.8, sin(2.0 * -0.8 - _Time * _RightWaveSpeed) * 0.2 - 0.35))) - 0.1;
 
     //Makes coconut hairy
-    coconut = smoothstep(0.0, 0.05, coconut);
+    coconut = smoothstep(0.0, 0.03, coconut);
 
     //Colors coconut
     allColors = mix(clamp(vec3(0.4, 0.2, 0.1) * clamp(sunSinSpeed + 1.0, 0.4, 1.0), vec3(0.0), vec3(1.0)), allColors, coconut);
