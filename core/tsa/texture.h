@@ -4,4 +4,6 @@
 
 #pragma once
 
-unsigned int loadTexture(const char* filePath, int wrapMode, int filterMode);
+namespace tsa {
+    unsigned int loadTexture(const char *filePath, int wrapMode, int minFilterMode, int maxFilterMode);
+}
