@@ -9,6 +9,7 @@
 #include <imgui_impl_opengl3.h>
 
 #include <tsa/shader.h>
+#include <ew/shader.h>
 
 struct Vertex {
     float x, y, z;
@@ -22,11 +23,11 @@ const int SCREEN_WIDTH = 1080;
 const int SCREEN_HEIGHT = 720;
 
 Vertex vertices[4] = {
-    //x    y    z    u    v
-    { -1, -1, 0.0, 0.0, 0.0 }, //Bottom left
-    { 1, -1, 0.0, 1.0, 0.0 }, //Bottom right
-    { 1,  1, 0.0, 1.0, 1.0 },  //Top right
-    { -1, 1, 0.0, 0.0, 1.0 }  //Top left
+        //x    y    z    u    v
+        { -1, -1, 0.0, 0.0, 0.0 }, //Bottom left
+        { 1, -1, 0.0, 1.0, 0.0 }, //Bottom right
+        { 1,  1, 0.0, 1.0, 1.0 },  //Top right
+        { -1, 1, 0.0, 0.0, 1.0 }  //Top left
 };
 
 unsigned int indices[6] = {
@@ -37,35 +38,35 @@ unsigned int indices[6] = {
 bool showImGUIDemoWindow = true;
 
 int main() {
-	printf("Initializing...");
-	if (!glfwInit()) {
-		printf("GLFW failed to init!");
-		return 1;
-	}
+    printf("Initializing...");
+    if (!glfwInit()) {
+        printf("GLFW failed to init!");
+        return 1;
+    }
 
-	GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Triangle", NULL, NULL);
-	if (window == NULL) {
-		printf("GLFW failed to create window");
-		return 1;
-	}
-	glfwMakeContextCurrent(window);
-	glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
+    GLFWwindow* window = glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Hello Triangle", NULL, NULL);
+    if (window == NULL) {
+        printf("GLFW failed to create window");
+        return 1;
+    }
+    glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebufferSizeCallback);
 
-	if (!gladLoadGL(glfwGetProcAddress)) {
-		printf("GLAD Failed to load GL headers");
-		return 1;
-	}
+    if (!gladLoadGL(glfwGetProcAddress)) {
+        printf("GLAD Failed to load GL headers");
+        return 1;
+    }
 
-	//Initialize ImGUI
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui_ImplGlfw_InitForOpenGL(window, true);
-	ImGui_ImplOpenGL3_Init();
+    //Initialize ImGUI
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init();
 
     tsa::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
     shader.use();
 
-	unsigned int vao = createVAO(vertices, 12, indices, 6);
+    unsigned int vao = createVAO(vertices, 12, indices, 6);
     glBindVertexArray(vao);
 
     //Set initial colors
@@ -86,12 +87,12 @@ int main() {
     //Set initial uniforms
     shader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
 
-	while (!glfwWindowShouldClose(window)) {
-		glfwPollEvents();
-		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT);
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+        glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
 
-		//Set time uniform
+        //Set time uniform
         shader.setFloat("_Time", static_cast<float>(glfwGetTime()));
         shader.setVec3("_LeftWaveBaseColor", leftWaveBaseColor[0], leftWaveBaseColor[1], leftWaveBaseColor[2]);
         shader.setVec3("_RightWaveBaseColor", rightWaveBaseColor[0], rightWaveBaseColor[1], rightWaveBaseColor[2]);
@@ -110,13 +111,13 @@ int main() {
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, NULL);
 
-		//Render UI
-		{
-			ImGui_ImplGlfw_NewFrame();
-			ImGui_ImplOpenGL3_NewFrame();
-			ImGui::NewFrame();
-			ImGui::Begin("Settings");
-			ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
+        //Render UI
+        {
+            ImGui_ImplGlfw_NewFrame();
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui::NewFrame();
+            ImGui::Begin("Settings");
+            ImGui::Checkbox("Show Demo Window", &showImGUIDemoWindow);
             ImGui::DragFloat("Sun Speed", &sunSpeed, 0.5, 0, 10);
             ImGui::SliderFloat("Sun Radius", &sunRadius, -0.1, 1);
             ImGui::DragFloat("Left Wave Speed", &leftWaveSpeed, 1, 5);
@@ -132,23 +133,23 @@ int main() {
             ImGui::ColorEdit3("Night Sky Color Bottom", nightSkyColorBottom);
 
 
-			ImGui::End();
-			if (showImGUIDemoWindow) {
-				ImGui::ShowDemoWindow(&showImGUIDemoWindow);
-			}
+            ImGui::End();
+            if (showImGUIDemoWindow) {
+                ImGui::ShowDemoWindow(&showImGUIDemoWindow);
+            }
 
-			ImGui::Render();
-			ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-		}
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        }
 
-		glfwSwapBuffers(window);
-	}
-	printf("Shutting down...");
+        glfwSwapBuffers(window);
+    }
+    printf("Shutting down...");
 }
 
 unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indicesData, int numIndices) {
-	unsigned int vao;
-	glGenVertexArrays(1, &vao);
+    unsigned int vao;
+    glGenVertexArrays(1, &vao);
     glBindVertexArray(vao);
 
     unsigned int vbo;
@@ -157,25 +158,24 @@ unsigned int createVAO(Vertex* vertexData, int numVertices, unsigned int* indice
     //Allocate space for + send vertex data to GPU.
     glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * numVertices, vertexData, GL_STATIC_DRAW);
 
-	//Define a new buffer id
+    //Define a new buffer id
     unsigned int ebo;
     glGenBuffers(1, &ebo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * numIndices, indicesData, GL_STATIC_DRAW);
 
-	//Position attribute
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex,x));
-	glEnableVertexAttribArray(0);
+    //Position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex,x));
+    glEnableVertexAttribArray(0);
 
     //UV attribute
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (const void*)offsetof(Vertex,u));
     glEnableVertexAttribArray(1);
 
-	return vao;
+    return vao;
 }
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
-	glViewport(0, 0, width, height);
+    glViewport(0, 0, width, height);
 }
-

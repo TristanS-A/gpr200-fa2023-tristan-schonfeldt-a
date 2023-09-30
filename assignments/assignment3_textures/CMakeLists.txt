@@ -13,7 +13,7 @@ file(
 )
 #Copies this assignment3_textures_sunset's asset folder to bin when it is built
 add_custom_target(copyAssetsA3 ALL COMMAND ${CMAKE_COMMAND} -E copy_directory
-${CMAKE_CURRENT_SOURCE_DIR}/assets/
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/
 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/)
 
 install(FILES ${ASSIGNMENT3_INC} DESTINATION include/assignment3_textures)

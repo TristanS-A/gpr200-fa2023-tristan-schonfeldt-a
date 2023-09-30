@@ -5,7 +5,7 @@
 #include "../ew/external/glad.h"
 
 namespace tsa {
-	std::string loadShaderSourceFromFile(const std::string& filePath);
+    std::string loadShaderSourceFromFile(const std::string& filePath);
 
     unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource);
 

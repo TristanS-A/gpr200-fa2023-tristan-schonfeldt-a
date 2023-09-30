@@ -1,8 +1,8 @@
 #include "shader.h"
 
 namespace tsa {
-	std::string loadShaderSourceFromFile(const std::string& filePath)
-	{
+    std::string loadShaderSourceFromFile(const std::string& filePath)
+    {
         std::ifstream fstream(filePath);
         if (!fstream.is_open()) {
             printf("Failed to load file %s", filePath.c_str());
@@ -11,7 +11,7 @@ namespace tsa {
         std::stringstream buffer;
         buffer << fstream.rdbuf();
         return buffer.str();
-	}
+    }
 
     unsigned int createShaderProgram(const char* vertexShaderSource, const char* fragmentShaderSource){
         unsigned int vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSource);
@@ -55,8 +55,8 @@ namespace tsa {
     }
 
     Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader){
-        std::string vertexShaderSource = tsa::loadShaderSourceFromFile("assets/bgVertShader.vert");
-        std::string fragmentShaderSource = tsa::loadShaderSourceFromFile("assets/bgFragShader.frag");
+        std::string vertexShaderSource = tsa::loadShaderSourceFromFile("assets/vertexShader.vert");
+        std::string fragmentShaderSource = tsa::loadShaderSourceFromFile("assets/fragmentShader.frag");
 
         m_id = createShaderProgram(vertexShaderSource.c_str(), fragmentShaderSource.c_str());
     }
@@ -85,4 +85,3 @@ namespace tsa {
         glUniform4f(glGetUniformLocation(m_id, name.c_str()), x, y, z, w);
     }
 }
-

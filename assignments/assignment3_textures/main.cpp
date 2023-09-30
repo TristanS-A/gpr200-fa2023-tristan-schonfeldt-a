@@ -70,6 +70,11 @@ int main() {
     unsigned int characterText = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
     unsigned int noiseText = tsa::loadTexture("assets/noiseTexture.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
+    //Sets initial uniforms
+    characterShader.use();
+    characterShader.setVec2("_SpriteXY", 500, 500);
+    characterShader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
+
     ////////////Another way to display multiple textures
     /*
      ///////////Outside render loop:
@@ -99,44 +104,91 @@ int main() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 
+    float xPos = 0;
+    float xVel = 0.01;
+
+    float yPos = 0;
+    float yVel = 0.01;
+
+    float currTime = static_cast<float>(glfwGetTime());
+    float prevTime = static_cast<float>(glfwGetTime());
+    float idleTime = 0;
+
+    const float FPS = 1 / 60.0;
+
     while (!glfwWindowShouldClose(window)) {
-        glfwPollEvents();
-        glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        currTime = static_cast<float>(glfwGetTime());
+        if (currTime > prevTime + FPS) {
+            prevTime = currTime;
 
-        //Set uniforms
-        bgShader.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, bgText);
+            glfwPollEvents();
+            glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT);
 
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, noiseText);
-        bgShader.setInt("_NoiseStuff", 1);
-        bgShader.setFloat("_Time", static_cast<float>(glfwGetTime()));
+            //Set uniforms
+            bgShader.use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, bgText);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, noiseText);
+            bgShader.setInt("_NoiseStuff", 1);
+            bgShader.setFloat("_Time", currTime);
 
-        characterShader.use();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, characterText);
-        characterShader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+            characterShader.use();
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, characterText);
 
-        //Render UI
-        {
-            ImGui_ImplGlfw_NewFrame();
-            ImGui_ImplOpenGL3_NewFrame();
-            ImGui::NewFrame();
+            bool leftKeyDown = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+            bool rightKeyDown = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
+            bool upKeyDown = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
+            bool downKeyDown = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
 
-            ImGui::Begin("Settings");
-            ImGui::End();
+            if (leftKeyDown || rightKeyDown || upKeyDown || downKeyDown) {
+                idleTime = currTime - 2/ew::PI;
+                if (leftKeyDown && xPos > -1) {
+                    xPos -= xVel;
+                    characterShader.setFloat("_XPos", xPos);
+                }
+                if (rightKeyDown && xPos < 1) {
+                    xPos += xVel;
+                    characterShader.setFloat("_XPos", xPos);
+                }
+                if (upKeyDown && yPos < 1) {
+                    yPos += yVel;
+                    characterShader.setFloat("_YPos", yPos);
+                }
+                if (downKeyDown && yPos > -1) {
+                    yPos -= yVel;
+                    characterShader.setFloat("_YPos", yPos);
+                }
+            }
+            else {
+                xPos = sin((currTime - idleTime) * 2.5) * 0.005 + xPos;
+                yPos = cos((currTime - idleTime) * 5) * 0.005 + yPos;
+                characterShader.setFloat("_XPos", xPos);
+                characterShader.setFloat("_YPos", yPos);
+            }
 
-            ImGui::Render();
-            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
+
+            //Render UI
+            {
+                ImGui_ImplGlfw_NewFrame();
+                ImGui_ImplOpenGL3_NewFrame();
+                ImGui::NewFrame();
+
+                ImGui::Begin("Settings");
+                ImGui::End();
+
+                ImGui::Render();
+                ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            }
+
+            glfwSwapBuffers(window);
         }
-
-        glfwSwapBuffers(window);
     }
     printf("Shutting down...");
 }
