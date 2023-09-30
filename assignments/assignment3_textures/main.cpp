@@ -59,16 +59,16 @@ int main() {
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init();
 
-    ew::Shader bgShader("assets/bgVertShader.vert", "assets/bgFragShader.frag");
-    ew::Shader characterShader("assets/characterVertShader.vert", "assets/characterFragShader.frag");
+    ew::Shader bgShader("assets1/bgVertShader.vert", "assets1/bgFragShader.frag");
+    ew::Shader characterShader("assets1/characterVertShader.vert", "assets1/characterFragShader.frag");
 
     unsigned int quadVAO = createVAO(vertices, 4, indices, 6);
 
     glBindVertexArray(quadVAO);
 
-    unsigned int bgText = tsa::loadTexture("assets/spook.jpg", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    unsigned int characterText = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
-    unsigned int noiseText = tsa::loadTexture("assets/noiseTexture.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int bgText = tsa::loadTexture("assets1/spook.jpg", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int characterText = tsa::loadTexture("assets1/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
+    unsigned int noiseText = tsa::loadTexture("assets1/noiseTexture.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
     ////////////Another way to display multiple textures
     /*
@@ -119,6 +119,7 @@ int main() {
         characterShader.use();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, characterText);
+        characterShader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 

@@ -55,8 +55,8 @@ namespace tsa {
     }
 
     Shader::Shader(const std::string& vertexShader, const std::string& fragmentShader){
-        std::string vertexShaderSource = tsa::loadShaderSourceFromFile("assets/bgVertShader.vert");
-        std::string fragmentShaderSource = tsa::loadShaderSourceFromFile("assets/bgFragShader.frag");
+        std::string vertexShaderSource = tsa::loadShaderSourceFromFile("assets1/bgVertShader.vert");
+        std::string fragmentShaderSource = tsa::loadShaderSourceFromFile("assets1/bgFragShader.frag");
 
         m_id = createShaderProgram(vertexShaderSource.c_str(), fragmentShaderSource.c_str());
     }
