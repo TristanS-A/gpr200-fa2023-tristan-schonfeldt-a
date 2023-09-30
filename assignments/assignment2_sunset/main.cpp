@@ -62,7 +62,7 @@ int main() {
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
 
-    tsa::Shader shader("assets1/vertexShader.vert", "assets1/fragmentShader.frag");
+    tsa::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
     shader.use();
 
 	unsigned int vao = createVAO(vertices, 12, indices, 6);

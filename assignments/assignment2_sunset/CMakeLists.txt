@@ -13,7 +13,7 @@ file(
 )
 #Copies this assignment2_sunset_sunset's asset folder to bin when it is built
 add_custom_target(copyAssetsA2 ALL COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${CMAKE_CURRENT_SOURCE_DIR}/assets1/
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets/
 ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/)
 
 install(FILES ${ASSIGNMENT2_INC} DESTINATION include/assignment2_sunset)
