@@ -67,6 +67,7 @@ int main() {
     glBindVertexArray(quadVAO);
 
     unsigned int bgText = tsa::loadTexture("assets/spook.jpg", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int bgText2 = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
     unsigned int characterText = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
     unsigned int noiseText = tsa::loadTexture("assets/noiseTexture.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
@@ -127,19 +128,33 @@ int main() {
 
             //Set uniforms
             bgShader.use();
+
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, bgText);
+            bgShader.setInt("_BGText", 0);
 
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, noiseText);
             bgShader.setInt("_NoiseStuff", 1);
+
+            glActiveTexture(GL_TEXTURE2);
+            glBindTexture(GL_TEXTURE_2D, bgText2);
+            bgShader.setInt("_BG2Text", 2);
+            
             bgShader.setFloat("_Time", currTime);
 
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
             characterShader.use();
-            glActiveTexture(GL_TEXTURE0);
+            
+            //Alternative way of handling placement of character texture (I don't know if this is better)
+            //glActiveTexture(GL_TEXTURE0);
+            //glBindTexture(GL_TEXTURE_2D, characterText);
+
+            glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, characterText);
+            characterShader.setInt("_CharacterText", 3);
+            characterShader.setFloat("_RotAngle", currTime);
 
             bool leftKeyDown = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
             bool rightKeyDown = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;

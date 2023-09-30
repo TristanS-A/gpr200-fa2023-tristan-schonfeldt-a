@@ -1,8 +1,7 @@
 #version 450
 out vec4 FragColor;
 in vec2 UV;
-uniform sampler2D _BGText;
 uniform sampler2D _CharacterText;
 void main(){
-	FragColor = texture(_BGText, UV);
+	FragColor = texture(_CharacterText, UV);
 }
