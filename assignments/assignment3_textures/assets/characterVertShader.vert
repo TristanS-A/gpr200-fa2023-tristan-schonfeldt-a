@@ -13,5 +13,9 @@ void main(){
                 cos(_RotAngle), -sin(_RotAngle),
                 sin(_RotAngle), cos(_RotAngle)
 				);
-	gl_Position = vec4(vec2(vPos.x * (_SpriteXY.x / _AspectRatio.x) + _XPos, vPos.y * (_SpriteXY.y / _AspectRatio.y) + _YPos) * rotMat, vPos.z,1.0);
+
+	vec2 CharPos = vec2(_XPos, _YPos);
+	vec2 scaledChar = vec2(vPos.x * (_SpriteXY.x / _AspectRatio.x), vPos.y * (_SpriteXY.y / _AspectRatio.y));
+
+	gl_Position = vec4(rotMat * scaledChar + CharPos, vPos.z,1.0);
 }

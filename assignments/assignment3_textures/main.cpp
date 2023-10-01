@@ -67,13 +67,12 @@ int main() {
     glBindVertexArray(quadVAO);
 
     unsigned int bgText = tsa::loadTexture("assets/spook.jpg", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-    unsigned int bgText2 = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
-    unsigned int characterText = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST);
+    unsigned int bgText2 = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+    unsigned int characterText = tsa::loadTexture("assets/duck.png", GL_REPEAT, GL_NEAREST_MIPMAP_NEAREST, GL_NEAREST);
     unsigned int noiseText = tsa::loadTexture("assets/noiseTexture.png", GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
 
     //Sets initial uniforms
     characterShader.use();
-    characterShader.setVec2("_SpriteXY", 500, 500);
     characterShader.setVec2("_AspectRatio", SCREEN_WIDTH, SCREEN_HEIGHT);
 
     ////////////Another way to display multiple textures
@@ -103,17 +102,29 @@ int main() {
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);*/
 
     glEnable(GL_BLEND);
-    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float xPos = 0;
-    float xVel = 0.01;
-
     float yPos = 0;
-    float yVel = 0.01;
+    float vel = 0.01;
+    float rotSpeed = 0.05;
+    float rotAngle = 0;
+    float charSizeX = 500;
+    float charSizeY = 500;
+
 
     float currTime = static_cast<float>(glfwGetTime());
     float prevTime = static_cast<float>(glfwGetTime());
     float idleTime = 0;
+
+    float tileSize = 1;
+    const char* ButtonNames[] = {"GL_REPEAT", "GL_CLAMP_TO_EDGE", "GL_CLAMP_TO_BORDER"};
+    int wrapTypes[3] = {GL_REPEAT, GL_CLAMP_TO_EDGE, GL_CLAMP_TO_BORDER};
+    int wrapType = 0;
+    float CharAlpha = 1;
+    float distortionSpeed = 1;
+    float distortionPower = 1;
+    float distortionColor[4] = {0.0, 0.0, 0.0, 1.0};
 
     const float FPS = 1 / 60.0;
 
@@ -133,52 +144,61 @@ int main() {
             glBindTexture(GL_TEXTURE_2D, bgText);
             bgShader.setInt("_BGText", 0);
 
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapTypes[wrapType]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapTypes[wrapType]);
+
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, noiseText);
             bgShader.setInt("_NoiseStuff", 1);
 
+
             glActiveTexture(GL_TEXTURE2);
             glBindTexture(GL_TEXTURE_2D, bgText2);
             bgShader.setInt("_BG2Text", 2);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, wrapTypes[wrapType]);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, wrapTypes[wrapType]);
             
             bgShader.setFloat("_Time", currTime);
+            bgShader.setFloat("_TileSize", tileSize);
+            bgShader.setFloat("_DistortionSpeed", distortionSpeed);
+            bgShader.setFloat("_DistortionPower", distortionPower);
+            bgShader.setVec4("_DistortionColor", distortionColor[0], distortionColor[1], distortionColor[2], distortionColor[3]);
 
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
             characterShader.use();
             
             //Alternative way of handling placement of character texture (I don't know if this is better)
+            //
             //glActiveTexture(GL_TEXTURE0);
             //glBindTexture(GL_TEXTURE_2D, characterText);
 
             glActiveTexture(GL_TEXTURE3);
             glBindTexture(GL_TEXTURE_2D, characterText);
             characterShader.setInt("_CharacterText", 3);
-            characterShader.setFloat("_RotAngle", currTime);
+            characterShader.setFloat("_CharAlpha", CharAlpha);
 
-            bool leftKeyDown = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-            bool rightKeyDown = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS;
-            bool upKeyDown = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS;
-            bool downKeyDown = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS;
-
-            if (leftKeyDown || rightKeyDown || upKeyDown || downKeyDown) {
+            if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
                 idleTime = currTime - 2/ew::PI;
-                if (leftKeyDown && xPos > -1) {
-                    xPos -= xVel;
-                    characterShader.setFloat("_XPos", xPos);
+                xPos += vel * sin(rotAngle);
+                yPos += vel * cos(rotAngle);
+
+                if (xPos > 1){
+                    xPos = 1;
                 }
-                if (rightKeyDown && xPos < 1) {
-                    xPos += xVel;
-                    characterShader.setFloat("_XPos", xPos);
+                else if (xPos < -1){
+                    xPos = -1;
                 }
-                if (upKeyDown && yPos < 1) {
-                    yPos += yVel;
-                    characterShader.setFloat("_YPos", yPos);
+
+                if (yPos > 1){
+                    yPos = 1;
                 }
-                if (downKeyDown && yPos > -1) {
-                    yPos -= yVel;
-                    characterShader.setFloat("_YPos", yPos);
+                else if (yPos < -1){
+                    yPos = -1;
                 }
+
+                characterShader.setFloat("_YPos", yPos);
+                characterShader.setFloat("_XPos", xPos);
             }
             else {
                 xPos = sin((currTime - idleTime) * 2.5) * 0.005 + xPos;
@@ -186,6 +206,17 @@ int main() {
                 characterShader.setFloat("_XPos", xPos);
                 characterShader.setFloat("_YPos", yPos);
             }
+
+            if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+                rotAngle -= rotSpeed;
+                characterShader.setFloat("_RotAngle", rotAngle);
+            }
+            if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+                rotAngle += rotSpeed;
+                characterShader.setFloat("_RotAngle", rotAngle);
+            }
+
+            characterShader.setVec2("_SpriteXY", charSizeX, charSizeY);
 
             glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, NULL);
 
@@ -196,6 +227,16 @@ int main() {
                 ImGui::NewFrame();
 
                 ImGui::Begin("Settings");
+                ImGui::DragFloat("Tiles", &tileSize, 0.5, 0, 100);
+                ImGui::Combo("Wrap Type", &wrapType, ButtonNames, 3);
+                ImGui::DragFloat("Character Alpha", &CharAlpha, 0.01, 0, 1);
+                ImGui::ColorEdit4("Distortion Color", distortionColor);
+                ImGui::DragFloat("Distortion Speed", &distortionSpeed, 0.1);
+                ImGui::DragFloat("Distortion Power", &distortionPower, 0.01, 0, 5);
+                ImGui::DragFloat("Character Rotation Speed", &rotSpeed, 0.01, 0, 1);
+                ImGui::DragFloat("Character Movement Speed", &vel, 0.01, 0, 1);
+                ImGui::DragFloat("Character Size X", &charSizeX, 1, 0, SCREEN_WIDTH * 2);
+                ImGui::DragFloat("Character Size Y", &charSizeY, 1, 0, SCREEN_HEIGHT * 2);
                 ImGui::End();
 
                 ImGui::Render();
