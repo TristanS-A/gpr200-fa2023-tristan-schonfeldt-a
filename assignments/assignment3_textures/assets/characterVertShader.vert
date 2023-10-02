@@ -9,13 +9,19 @@ uniform float _YPos;
 uniform float _RotAngle;
 void main(){
 	UV = vUV;
+
+	//Sets up rotation matrix
 	mat2 rotMat = mat2(
                 cos(_RotAngle), -sin(_RotAngle),
                 sin(_RotAngle), cos(_RotAngle)
 				);
 
+	//Sets up character pos
 	vec2 CharPos = vec2(_XPos, _YPos);
+
+	//Rotates character aroung the origin
 	vec2 scaledChar = vec2(vPos.x * (_SpriteXY.x / _AspectRatio.x), vPos.y * (_SpriteXY.y / _AspectRatio.y));
 
+	//Adds player pos
 	gl_Position = vec4(rotMat * scaledChar + CharPos, vPos.z,1.0);
 }
