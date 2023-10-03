@@ -258,6 +258,7 @@ int main() {
                 ImGui::ColorEdit4("Distortion Color", distortionColor);
                 ImGui::DragFloat("Distortion Speed", &distortionSpeed, 0.1);
                 ImGui::DragFloat("Distortion Power", &distortionPower, 0.01, 0, 5);
+                ImGui::Text("Controls: W and Left and Rigth Arrows");
                 ImGui::DragFloat("Character Rotation Speed", &rotSpeed, 0.01, 0, 1);
                 ImGui::DragFloat("Character Movement Speed", &vel, 0.01, 0, 1);
                 ImGui::DragFloat("Character Size X", &charSizeX, 1, 0, SCREEN_WIDTH * 2);
