@@ -3,6 +3,7 @@
 #include <sstream>
 #include <fstream>
 #include "../ew/external/glad.h"
+#include "../ew/ewMath/mat4.h"
 
 namespace tsa {
     std::string loadShaderSourceFromFile(const std::string& filePath);
@@ -26,6 +27,8 @@ namespace tsa {
         void setVec3(const std::string &name, float x, float y, float z) const;
 
         void setVec4(const std::string &name, float x, float y, float z, float w) const;
+
+        void setMat4(const std::string& name, const ew::Mat4& v) const;
     private:
         unsigned int m_id;
     };

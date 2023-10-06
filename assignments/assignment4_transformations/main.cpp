@@ -8,7 +8,8 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-#include <ew/shader.h>
+#include <tsa/shader.h>
+#include <tsa/transfromations.h>
 #include <ew/ewMath/vec3.h>
 #include <ew/procGen.h>
 
@@ -51,10 +52,24 @@ int main() {
 	//Depth testing - required for depth sorting!
 	glEnable(GL_DEPTH_TEST);
 
-	ew::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
+	tsa::Shader shader("assets/vertexShader.vert", "assets/fragmentShader.frag");
 	
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
+
+	tsa::Transform transform1; 
+	transform1.position = { -0.5, 0.5, 0.0 };
+	tsa::Transform transform2;
+	transform2.position = { 0.5, 0.5, 0.0 };
+	tsa::Transform transform3;
+	transform3.position = { 0.5, -0.5, 0.0 };
+	tsa::Transform transform4;
+	transform4.position = { -0.5, -0.5, 0.0 };
+	const int NUM_TRANSFORMS = 4;
+
+	tsa::Transform transforms[4] = {
+		transform1, transform2, transform3, transform4
+	};
 	
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -65,9 +80,11 @@ int main() {
 		//Set uniforms
 		shader.use();
 
-		//TODO: Set model matrix uniform
-
-		cubeMesh.draw();
+		for (int i = 0; i < NUM_TRANSFORMS; i++)
+		{
+			shader.setMat4("_ModelMat", transforms[i].getModelMatrix());
+			cubeMesh.draw();
+		}
 
 		//Render UI
 		{
@@ -76,6 +93,15 @@ int main() {
 			ImGui::NewFrame();
 
 			ImGui::Begin("Transform");
+			for (size_t i = 0; i < NUM_TRANSFORMS; i++) {
+				ImGui::PushID(i);
+				if (ImGui::CollapsingHeader("Transform")) {
+					ImGui::DragFloat3("Position", &transforms[i].position.x, 0.05f);
+					ImGui::DragFloat3("Rotation", &transforms[i].rotation.x, 1.0f);
+					ImGui::DragFloat3("Scale", &transforms[i].scale.x, 0.05f);
+				}
+				ImGui::PopID();
+			}
 			ImGui::End();
 
 			ImGui::Render();
