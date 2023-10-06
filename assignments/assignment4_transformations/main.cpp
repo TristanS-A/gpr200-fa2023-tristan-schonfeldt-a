@@ -57,6 +57,7 @@ int main() {
 	//Cube mesh
 	ew::Mesh cubeMesh(ew::createCube(0.5f));
 
+    //Makes transforms for cubes
 	tsa::Transform transform1; 
 	transform1.position = { -0.5, 0.5, 0.0 };
 	tsa::Transform transform2;
@@ -67,6 +68,7 @@ int main() {
 	transform4.position = { -0.5, -0.5, 0.0 };
 	const int NUM_TRANSFORMS = 4;
 
+    //Makes array of transforms
 	tsa::Transform transforms[4] = {
 		transform1, transform2, transform3, transform4
 	};
@@ -80,6 +82,7 @@ int main() {
 		//Set uniforms
 		shader.use();
 
+        //Sets model transform uniforms of all transforms in transforms array
 		for (int i = 0; i < NUM_TRANSFORMS; i++)
 		{
 			shader.setMat4("_ModelMat", transforms[i].getModelMatrix());
@@ -92,6 +95,7 @@ int main() {
 			ImGui_ImplOpenGL3_NewFrame();
 			ImGui::NewFrame();
 
+            //ImGui controls for all cube transforms
 			ImGui::Begin("Transform");
 			for (size_t i = 0; i < NUM_TRANSFORMS; i++) {
 				ImGui::PushID(i);
