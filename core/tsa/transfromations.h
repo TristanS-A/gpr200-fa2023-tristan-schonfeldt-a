@@ -68,4 +68,32 @@ namespace tsa {
 			return Translate(position) * RotateY(ew::Radians(rotation.y)) * RotateX(ew::Radians(rotation.x)) * RotateZ(ew::Radians(rotation.z)) * Scale(scale);
 		}
 	};
+
+    inline ew::Mat4 LookAt(ew::Vec3 eyePos, ew::Vec3 target, ew::Vec3 up){
+        //Epic Gram-Schmidt moment
+
+        ew::Vec3 forward = target - eyePos;
+        forward = forward / ew::Magnitude(forward);
+
+        ew::Vec3 right = ew::Cross(forward, up);
+        right = right / ew::Magnitude(right);
+
+        ew::Vec3 left = ew::Cross(forward, right);
+        left = left / ew::Magnitude(left);
+
+        return ew::Mat4(
+                right.x, left.x, forward.x, 0,
+                right.y, left.y, forward.y, 0,
+                right.z, left.z, forward.z, 0,
+                0, 0, 0, 1
+                );
+    }
+
+    inline ew::Mat4 Orthographic(float height, float aspect, float near, float far){
+
+    }
+
+    inline ew::Mat4 Perspective(float fov, float aspect, float near, float far){
+
+    }
 }
