@@ -65,35 +65,45 @@ namespace tsa {
 		ew::Vec3 rotation = ew::Vec3(0.0f, 0.0f, 0.0f); //Euler angles (degrees)
 		ew::Vec3 scale = ew::Vec3(1.0f, 1.0f, 1.0f);
 		ew::Mat4 getModelMatrix() const {
-			return Translate(position) * RotateY(ew::Radians(rotation.y)) * RotateX(ew::Radians(rotation.x)) * RotateZ(ew::Radians(rotation.z)) * Scale(scale);
+			return tsa::Translate(position) * RotateY(ew::Radians(rotation.y)) * RotateX(ew::Radians(rotation.x)) * RotateZ(ew::Radians(rotation.z)) * tsa::Scale(scale);
 		}
 	};
 
-    inline ew::Mat4 LookAt(ew::Vec3 eyePos, ew::Vec3 target, ew::Vec3 up){
+    inline ew::Mat4 LookAt(ew::Vec3 eyePos, ew::Vec3 target, ew::Vec3 upVec){
         //Epic Gram-Schmidt moment
 
         ew::Vec3 forward = target - eyePos;
         forward = forward / ew::Magnitude(forward);
 
-        ew::Vec3 right = ew::Cross(forward, up);
+        ew::Vec3 right = ew::Cross(forward, upVec);
         right = right / ew::Magnitude(right);
 
-        ew::Vec3 left = ew::Cross(forward, right);
-        left = left / ew::Magnitude(left);
+        ew::Vec3 up = ew::Cross(forward, right);
+        up = up / ew::Magnitude(up);
 
         return ew::Mat4(
-                right.x, left.x, forward.x, 0,
-                right.y, left.y, forward.y, 0,
-                right.z, left.z, forward.z, 0,
+                right.x, up.x, forward.x, 0,
+                right.y, up.y, forward.y, 0,
+                right.z, up.z, forward.z, 0,
                 0, 0, 0, 1
                 );
     }
 
     inline ew::Mat4 Orthographic(float height, float aspect, float near, float far){
-
+        return ew::Mat4(
+                -2 / (height * aspect), 0, 0, 0,
+                0, 2 / height, 0, 0,
+                0, 0, -2 / (far - near), -(far + near) / (far - near),
+                0, 0, 0, 1
+                );
     }
 
     inline ew::Mat4 Perspective(float fov, float aspect, float near, float far){
-
+        return  ew::Mat4(
+                1 / (tan(fov / 2) * aspect), 0, 0, 0,
+                0, 1 / (tan(fov / 2)), 0, 0,
+                0, 0, (near + far) / (near - far), (2 * far * near) / (near - far),
+                0, 0, -1, 0
+                );
     }
 }

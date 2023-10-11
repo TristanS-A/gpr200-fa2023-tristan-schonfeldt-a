@@ -11,6 +11,7 @@
 #include <ew/shader.h>
 #include <ew/procGen.h>
 #include <ew/transform.h>
+#include "tsa/camera.h"
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 
@@ -66,6 +67,9 @@ int main() {
 		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
 	}
 
+    //Camera creation
+    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1, 100, false, 6};
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
@@ -82,6 +86,9 @@ int main() {
 			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
 			cubeMesh.draw();
 		}
+
+        shader.setMat4("_View", cam.ViewMatrix());
+        shader.setMat4("_Clip", cam.ProjectionMatrix());
 
 		//Render UI
 		{
@@ -102,6 +109,7 @@ int main() {
 				ImGui::PopID();
 			}
 			ImGui::Text("Camera");
+            ImGui::DragFloat3("Cam Position", &cam.position.x, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();
