@@ -67,8 +67,8 @@ int main() {
 		cubeTransforms[i].position.y = i / (NUM_CUBES / 2) - 0.5;
 	}
 
-    //Camera creation
-    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1, 100, false, 6};
+    //Camera creatifon
+    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1, 100, true, 6};
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();

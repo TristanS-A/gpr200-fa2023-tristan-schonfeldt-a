@@ -19,12 +19,7 @@ namespace tsa{
         bool orthographic;
         float orthoSize;
         ew::Mat4 ViewMatrix(){
-            return LookAt(position, target, ew::Vec3(0, 1, 0)) * ew::Mat4(
-                                                                                1, 0, 0, -position.x,
-                                                                                0, 1, 0, -position.y,
-                                                                                0, 0, 1, -position.z,
-                                                                                0, 0, 0, 1
-                                                                                );
+            return LookAt(position, target, ew::Vec3(0, 1, 0));
         };
         ew::Mat4 ProjectionMatrix(){
             if (orthographic){

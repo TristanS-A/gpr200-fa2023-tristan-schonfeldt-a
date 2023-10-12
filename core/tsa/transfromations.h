@@ -75,24 +75,28 @@ namespace tsa {
         ew::Vec3 forward = target - eyePos;
         forward = forward / ew::Magnitude(forward);
 
-        ew::Vec3 right = ew::Cross(forward, upVec);
+        ew::Vec3 right = ew::Cross(upVec, forward);
         right = right / ew::Magnitude(right);
 
-        ew::Vec3 up = ew::Cross(forward, right);
+        ew::Vec3 up = ew::Cross(right, forward);
         up = up / ew::Magnitude(up);
 
         return ew::Mat4(
-                right.x, up.x, forward.x, 0,
-                right.y, up.y, forward.y, 0,
-                right.z, up.z, forward.z, 0,
+                right.x, right.y, right.z, -ew::Dot(right, eyePos),
+                up.x, up.y, up.z, -ew::Dot(up, eyePos),
+                forward.x, forward.y, forward.z, -ew::Dot(forward, eyePos),
                 0, 0, 0, 1
                 );
     }
 
     inline ew::Mat4 Orthographic(float height, float aspect, float near, float far){
+        float t = height / 2;
+        float b = -t;
+        float r = (height * aspect) / 2;
+        float l = -r;
         return ew::Mat4(
-                -2 / (height * aspect), 0, 0, 0,
-                0, 2 / height, 0, 0,
+                2 / (r - l), 0, 0, -(r + l) / (r - l),
+                0, 2 / (t - b), 0, -(t + b) / (t - b),
                 0, 0, -2 / (far - near), -(far + near) / (far - near),
                 0, 0, 0, 1
                 );
