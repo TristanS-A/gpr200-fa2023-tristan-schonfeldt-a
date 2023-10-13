@@ -1,7 +1,7 @@
 #pragma once
 #include "../ew/ewMath/mat4.h"
 #include "../ew/ewMath/vec3.h"
-#include <ew/ewMath/ewMath.h>
+#include "../ew/ewMath/ewMath.h"
 
 namespace tsa {
 
@@ -72,14 +72,14 @@ namespace tsa {
     inline ew::Mat4 LookAt(ew::Vec3 eyePos, ew::Vec3 target, ew::Vec3 upVec){
         //Epic Gram-Schmidt moment
 
-        ew::Vec3 forward = target - eyePos;
-        forward = forward / ew::Magnitude(forward);
+        ew::Vec3 forward = eyePos - target;
+		forward = ew::Normalize(forward);
 
         ew::Vec3 right = ew::Cross(upVec, forward);
-        right = right / ew::Magnitude(right);
+        right = ew::Normalize(right);
 
-        ew::Vec3 up = ew::Cross(right, forward);
-        up = up / ew::Magnitude(up);
+        ew::Vec3 up = ew::Cross(forward, right);
+        up = ew::Normalize(up);
 
         return ew::Mat4(
                 right.x, right.y, right.z, -ew::Dot(right, eyePos),

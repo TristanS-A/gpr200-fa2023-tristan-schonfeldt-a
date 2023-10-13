@@ -68,7 +68,7 @@ int main() {
 	}
 
     //Camera creatifon
-    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), SCREEN_WIDTH / SCREEN_HEIGHT, 0.1, 100, true, 6};
+    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT, 0.1, 100, false, 6};
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -83,12 +83,9 @@ int main() {
 		for (size_t i = 0; i < NUM_CUBES; i++)
 		{
 			//Construct model matrix
-			shader.setMat4("_Model", cubeTransforms[i].getModelMatrix());
+			shader.setMat4("_MVP", cam.ProjectionMatrix() * cam.ViewMatrix() * cubeTransforms[i].getModelMatrix());
 			cubeMesh.draw();
 		}
-
-        shader.setMat4("_View", cam.ViewMatrix());
-        shader.setMat4("_Clip", cam.ProjectionMatrix());
 
 		//Render UI
 		{
