@@ -7,6 +7,7 @@
 #include "../ew/ewMath/vec3.h"
 #include <ew/ewMath/ewMath.h>
 #include "transfromations.h"
+#include <bits/stdc++.h>
 
 namespace tsa{
     struct Camera {
@@ -29,5 +30,68 @@ namespace tsa{
                 return Perspective(ew::Radians(fov), aspect, nearPlain, farPlain);
             }
         };
+    };
+
+    struct CameraControls {
+        double prevMouseX, prevMouseY;
+        float yaw = 0, pitch = 0;
+        float mouseSensitivity = 0.1f;
+        bool firstMouse = true;
+        float moveSpeed = 5.0f;
+
+        void moveCamera(GLFWwindow *window, Camera *camera, float deltaTime){
+            if (!glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_2)){
+                glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                firstMouse = true;
+                return;
+            }
+
+            glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+            double mouseX, mouseY;
+            glfwGetCursorPos(window, &mouseX, &mouseY);
+
+            if (firstMouse){
+                firstMouse = false;
+                prevMouseX = mouseX;
+                prevMouseY = mouseY;
+            }
+
+            const float clampLow = -89;
+            const float clampHigh = 89;
+            pitch += mouseX - prevMouseX;
+            yaw += mouseY - prevMouseY;
+
+            ew::Vec3 forward = ew::Vec3(ew::Radians(std::clamp((pitch), clampLow, clampHigh)),ew::Radians((yaw)), -1);
+
+            camera->target = camera->position + forward;
+
+            prevMouseX = mouseX;
+            prevMouseY = mouseY;
+
+            ew::Vec3 right = ew::Normalize(ew::Cross(forward, ew::Vec3(0, 1, 0)));
+            ew::Vec3 up = ew::Normalize(ew::Cross(forward, right));
+
+            if (glfwGetKey(window,GLFW_KEY_W)){
+                camera->position += forward * moveSpeed * deltaTime;
+            }
+            else if (glfwGetKey(window,GLFW_KEY_S)){
+                camera->position += forward * -moveSpeed * deltaTime;
+            }
+
+            if (glfwGetKey(window,GLFW_KEY_A)){
+                camera->position += right * moveSpeed * deltaTime;
+            }
+            else if (glfwGetKey(window,GLFW_KEY_D)){
+                camera->position += right * -moveSpeed * deltaTime;
+            }
+
+            if (glfwGetKey(window,GLFW_KEY_Q)){
+                camera->position += up * moveSpeed * deltaTime;
+            }
+            else if (glfwGetKey(window,GLFW_KEY_E)){
+                camera->position += up * -moveSpeed * deltaTime;
+            }
+        }
     };
 }

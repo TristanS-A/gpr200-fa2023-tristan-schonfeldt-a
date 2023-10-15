@@ -70,11 +70,22 @@ int main() {
     //Camera creatifon
     tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), 60, static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT, 0.1, 100, false, 6};
 
+    //Camera controls
+    tsa::CameraControls controls;
+
+    float prevTime = (float)glfwGetTime();
+
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		glClearColor(0.3f, 0.4f, 0.9f, 1.0f);
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        float time = (float)glfwGetTime();
+        float deltaTime = time - prevTime;
+        prevTime = time;
+
+        controls.moveCamera(window, &cam, deltaTime);
 
 		//Set uniforms
 		shader.use();
