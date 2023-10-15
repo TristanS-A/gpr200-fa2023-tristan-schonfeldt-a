@@ -26,7 +26,7 @@ namespace tsa{
                 return Orthographic(orthoSize, aspect, nearPlain, farPlain);
             }
             else {
-                return Perspective(fov, aspect, nearPlain, farPlain);
+                return Perspective(ew::Radians(fov), aspect, nearPlain, farPlain);
             }
         };
     };

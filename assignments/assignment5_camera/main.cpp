@@ -68,7 +68,7 @@ int main() {
 	}
 
     //Camera creatifon
-    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), ew::Radians(60), static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT, 0.1, 100, false, 6};
+    tsa::Camera cam = {ew::Vec3(0, 0, 5), ew::Vec3(0, 0, 0), 60, static_cast<float>(SCREEN_WIDTH) / SCREEN_HEIGHT, 0.1, 100, false, 6};
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -107,6 +107,10 @@ int main() {
 			}
 			ImGui::Text("Camera");
             ImGui::DragFloat3("Cam Position", &cam.position.x, 0.05f);
+            ImGui::DragFloat3("Cam Target", &cam.target.x, 0.05f);
+            ImGui::Checkbox("Orthographic", &cam.orthographic);
+            ImGui::DragFloat("FOV", &cam.fov, 0.05f);
+            ImGui::DragFloat("Ortho Height", &cam.orthoSize, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();
