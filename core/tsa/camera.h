@@ -7,7 +7,6 @@
 #include "../ew/ewMath/vec3.h"
 #include <ew/ewMath/ewMath.h>
 #include "transfromations.h"
-#include <bits/stdc++.h>
 
 namespace tsa{
     struct Camera {
@@ -49,7 +48,7 @@ namespace tsa{
             glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
             double mouseX, mouseY;
-            glfwGetCursorPos(window, &mouseX, &mouseY);
+            glfwGetCursorPos(window, &mouseX, &mouseY);    
 
             if (firstMouse){
                 firstMouse = false;
@@ -59,12 +58,15 @@ namespace tsa{
 
             const float clampLow = -89;
             const float clampHigh = 89;
-            pitch += mouseX - prevMouseX;
-            yaw += mouseY - prevMouseY;
+            pitch += mouseSensitivity * (mouseX - prevMouseX);
+            yaw -= mouseSensitivity * (mouseY - prevMouseY);
 
-            ew::Vec3 forward = ew::Vec3(ew::Radians(std::clamp((pitch), clampLow, clampHigh)),ew::Radians((yaw)), -1);
+            pitch = tsa::clamp(pitch, clampLow, clampHigh);
 
-            camera->target = camera->position + forward;
+            float newPitch = ew::Radians(pitch);
+            float newYaw = ew::Radians(yaw);
+
+            ew::Vec3 forward = ew::Vec3(cos(newYaw) * cos(newPitch), sin(newPitch), sin(newYaw) * cos(newPitch));
 
             prevMouseX = mouseX;
             prevMouseY = mouseY;
@@ -80,10 +82,10 @@ namespace tsa{
             }
 
             if (glfwGetKey(window,GLFW_KEY_A)){
-                camera->position += right * moveSpeed * deltaTime;
+                camera->position += right * -moveSpeed * deltaTime;
             }
             else if (glfwGetKey(window,GLFW_KEY_D)){
-                camera->position += right * -moveSpeed * deltaTime;
+                camera->position += right * moveSpeed * deltaTime;
             }
 
             if (glfwGetKey(window,GLFW_KEY_Q)){
@@ -92,6 +94,9 @@ namespace tsa{
             else if (glfwGetKey(window,GLFW_KEY_E)){
                 camera->position += up * -moveSpeed * deltaTime;
             }
+
+            camera->target = camera->position + forward;
+        
         }
     };
 }

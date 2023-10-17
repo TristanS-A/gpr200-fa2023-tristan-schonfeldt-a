@@ -122,6 +122,8 @@ int main() {
             ImGui::Checkbox("Orthographic", &cam.orthographic);
             ImGui::DragFloat("FOV", &cam.fov, 0.05f);
             ImGui::DragFloat("Ortho Height", &cam.orthoSize, 0.05f);
+			ImGui::DragFloat("Pitch", &controls.pitch, 0.05f);
+			ImGui::DragFloat("Yaw", &controls.yaw, 0.05f);
 			ImGui::End();
 			
 			ImGui::Render();

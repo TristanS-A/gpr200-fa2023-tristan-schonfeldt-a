@@ -110,4 +110,14 @@ namespace tsa {
                 0, 0, -1, 0
                 );
     }
+
+	inline float clamp(float val, float low, float high) {
+		if (val < low) {
+			val = low;
+		}
+		else if (val > high) {
+			val = high;
+		}
+	    return val;
+	}
 }
