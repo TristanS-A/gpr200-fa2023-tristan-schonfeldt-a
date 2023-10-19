@@ -58,15 +58,15 @@ namespace tsa{
 
             const float clampLow = -89;
             const float clampHigh = 89;
-            pitch += mouseSensitivity * (mouseX - prevMouseX);
-            yaw -= mouseSensitivity * (mouseY - prevMouseY);
+            pitch += mouseSensitivity * (mouseY - prevMouseY);
+            yaw -= mouseSensitivity * (mouseX - prevMouseX);
 
             pitch = tsa::clamp(pitch, clampLow, clampHigh);
 
             float newPitch = ew::Radians(pitch);
             float newYaw = ew::Radians(yaw);
 
-            ew::Vec3 forward = ew::Vec3(cos(newYaw) * cos(newPitch), sin(newPitch), sin(newYaw) * cos(newPitch));
+            ew::Vec3 forward = ew::Vec3(sin(newYaw) * cos(newPitch), sin(newPitch), -cos(newYaw) * cos(newPitch));
 
             prevMouseX = mouseX;
             prevMouseY = mouseY;
