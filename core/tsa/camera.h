@@ -95,8 +95,14 @@ namespace tsa{
                 camera->position += up * -moveSpeed * deltaTime;
             }
 
+            if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT)) {
+                moveSpeed = 10.0;
+            }
+            else if (moveSpeed != 5.0){
+                moveSpeed = 5.0;
+            }
+
             camera->target = camera->position + forward;
-        
         }
     };
 }

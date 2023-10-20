@@ -124,6 +124,12 @@ int main() {
             ImGui::DragFloat("Ortho Height", &cam.orthoSize, 0.05f);
 			ImGui::DragFloat("Pitch", &controls.pitch, 0.05f);
 			ImGui::DragFloat("Yaw", &controls.yaw, 0.05f);
+			if (ImGui::Button("Reset")) {
+				cam.position = ew::Vec3(0, 0, 5);
+				cam.target = ew::Vec3(0, 0, 0);
+				controls.pitch = 0;
+				controls.yaw = 0;
+			}
 			ImGui::End();
 			
 			ImGui::Render();
