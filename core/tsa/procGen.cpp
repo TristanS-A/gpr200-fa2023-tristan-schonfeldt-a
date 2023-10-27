@@ -53,9 +53,25 @@ namespace tsa{
         for (int row = 0; row <= numSegments; row++){
             for (int col = 0; col <= numSegments; col++){
                 ew::Vertex currVertex;
-                currVertex.pos.x = size * (col / static_cast<float>(numSegments));
-                currVertex.pos.z = -size * (row / static_cast<float>(numSegments));
+                float newFloatSegments = static_cast<float>(numSegments);
+                currVertex.pos.x = size * (col / newFloatSegments);
+                currVertex.pos.z = -size * (row / newFloatSegments);
+                currVertex.uv.x = col / newFloatSegments;
+                currVertex.uv.y = row / newFloatSegments;
                 newMesh.vertices.push_back(currVertex);
+            }
+        }
+
+        int columns = numSegments + 1;
+        for (int row = 0; row < numSegments; row++) {
+            for (int col = 0; col < numSegments; col++) {
+                int start = row * columns + col; 
+                newMesh.indices.push_back(start);
+                newMesh.indices.push_back(start + 1);
+                newMesh.indices.push_back(start + columns + 1);
+                newMesh.indices.push_back(start + columns + 1);
+                newMesh.indices.push_back(start + columns);
+                newMesh.indices.push_back(start);
             }
         }
 
