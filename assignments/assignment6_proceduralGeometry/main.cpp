@@ -92,10 +92,15 @@ int main() {
 
     ew::Transform planeTransform;
 
-    ew::MeshData cylinderMeshData = tsa::createCylinder(0.5,0.5,40);
+    ew::MeshData cylinderMeshData = tsa::createCylinder(0.5,0.2,40);
     ew::Mesh cylinderMesh(cylinderMeshData);
 
     ew::Transform cylinderTransform;
+
+    ew::MeshData sphereMeshData = tsa::createSphere(0.5, 20);
+    ew::Mesh sphereMesh(sphereMeshData);
+
+    ew::Transform sphereTransform;
 
 	resetCamera(camera,cameraController);
 
@@ -115,8 +120,6 @@ int main() {
 		//Clear both color buffer AND depth buffer
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		
-
 		shader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		shader.setInt("_Texture", 0);
@@ -135,11 +138,15 @@ int main() {
 
         //Draw Plane
         shader.setMat4("_Model", planeTransform.getModelMatrix());
-        planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+        //planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
         //Draw Cylinder
         shader.setMat4("_Model", cylinderTransform.getModelMatrix());
         cylinderMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+        //Draw sphere
+        shader.setMat4("_Model", sphereTransform.getModelMatrix());
+        sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{
