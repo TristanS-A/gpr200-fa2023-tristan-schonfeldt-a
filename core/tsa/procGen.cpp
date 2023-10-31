@@ -18,8 +18,8 @@ namespace tsa{
             for (int col = 0; col <= numSegments; col++){
                 float theta = col * thetaStep;
                 ew::Vertex currVertex;
-                currVertex.pos = ew::Vec3(radius * sin(theta) * sin(phi), radius * cos(phi), radius * cos(theta) * sin(phi));
-                currVertex.uv = ew::Vec2((float)col / numSegments, (float)row / numSegments);
+                currVertex.pos = ew::Vec3(radius * cos(theta) * sin(phi), radius * cos(phi), radius * sin(theta) * sin(phi));
+                currVertex.uv = ew::Vec2((float)col / numSegments, abs((float)row / numSegments - 1));
                 currVertex.normal = ew::Normalize(ew::Vec3(currVertex.pos.x, currVertex.pos.y, currVertex.pos.z));
                 newMesh.vertices.push_back(currVertex);
             }
@@ -47,11 +47,11 @@ namespace tsa{
         }
 
         poleStart = numSegments * (numSegments + 1) + 1;
-        ringStart = numSegments * (numSegments + 1) - numSegments;
+        ringStart = numSegments * (numSegments + 1) - numSegments - 1;
         for (int i = 0; i < numSegments; i++){
-            newMesh.indices.push_back(ringStart + i);
-            newMesh.indices.push_back(poleStart + i);
             newMesh.indices.push_back(ringStart + i + 1);
+            newMesh.indices.push_back(poleStart + i);
+            newMesh.indices.push_back(ringStart + i);
         }
 
         return newMesh;
@@ -67,54 +67,13 @@ namespace tsa{
 
         newMesh.vertices.push_back(topCenter);
 
-        float thetaStep = ew::PI * 2 / numSegments;
-        for (int i = 0; i <= numSegments; i++){
-            float theta = i * thetaStep;
-            ew::Vertex currVertex;
-            currVertex.pos.x = radius * cos(theta);
-            currVertex.pos.z = radius * sin(theta);
-            currVertex.pos.y = topHeight;
-            currVertex.normal = ew::Vec3(0, 1, 0);
-            currVertex.uv.x = (cos(theta) + 1) * 0.5;
-            currVertex.uv.y = (sin(theta) + 1) * 0.5;
-            newMesh.vertices.push_back(currVertex);
-        }
+        makeRingWithInputNormals(newMesh, ew::Vec3(0, 1, 0), topHeight, radius, numSegments);
 
-        for (int i = 0; i <= numSegments; i++){
-            float theta = i * thetaStep;
-            ew::Vertex currVertex;
-            currVertex.pos.x = radius * cos(theta);
-            currVertex.pos.z = radius * sin(theta);
-            currVertex.pos.y = topHeight;
-            currVertex.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
-            currVertex.uv.x = (float)i / (numSegments + 1);
-            currVertex.uv.y = 1;
-            newMesh.vertices.push_back(currVertex);
-        }
+        makeRingWithSideNormals(newMesh, topHeight, radius, numSegments);
 
-        for (int i = 0; i <= numSegments; i++){
-            float theta = i * thetaStep;
-            ew::Vertex currVertex;
-            currVertex.pos.x = radius * cos(theta);
-            currVertex.pos.z = radius * sin(theta);
-            currVertex.pos.y = bottomHeight;
-            currVertex.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
-            currVertex.uv.x = (float)i / (numSegments + 1);
-            currVertex.uv.y = 0;
-            newMesh.vertices.push_back(currVertex);
-        }
+        makeRingWithSideNormals(newMesh, bottomHeight, radius, numSegments);
 
-        for (int i = 0; i <= numSegments; i++){
-            float theta = i * thetaStep;
-            ew::Vertex currVertex;
-            currVertex.pos.x = radius * cos(theta);
-            currVertex.pos.z = radius * sin(theta);
-            currVertex.pos.y = bottomHeight;
-            currVertex.normal = ew::Vec3(0, -1, 0);
-            currVertex.uv.x = (cos(theta) + 1) * 0.5;
-            currVertex.uv.y = (sin(theta) + 1) * 0.5;
-            newMesh.vertices.push_back(currVertex);
-        }
+        makeRingWithInputNormals(newMesh, ew::Vec3(0, -1, 0), bottomHeight, radius, numSegments);
 
         ew::Vertex bottomCenter = {ew::Vec3(0, bottomHeight, 0), ew::Vec3(0, -1, 0), ew::Vec2(0.5, 0.5)};
         newMesh.vertices.push_back(bottomCenter);
@@ -142,12 +101,42 @@ namespace tsa{
         start = numSegments * 3 + 4;
         center = numSegments * 4 + 5;
         for (int i = 0; i <= numSegments; i++){
-            newMesh.indices.push_back(start + i);
+            newMesh.indices.push_back(start + i + 1);
             newMesh.indices.push_back(center);
-            newMesh.indices.push_back(start + 1 + i);
+            newMesh.indices.push_back(start + i);
         }
 
         return newMesh;
+    }
+
+    void makeRingWithSideNormals(ew::MeshData& meshData, float yPos, float radius, int numSegments) {
+        float thetaStep = ew::PI * 2 / numSegments;
+        for (int i = 0; i <= numSegments; i++) {
+            float theta = i * thetaStep;
+            ew::Vertex currVertex;
+            currVertex.pos.x = radius * cos(theta);
+            currVertex.pos.z = radius * sin(theta);
+            currVertex.pos.y = yPos;
+            currVertex.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
+            currVertex.uv.x = (cos(theta) + 1) * 0.5;
+            currVertex.uv.y = (sin(theta) + 1) * 0.5;
+            meshData.vertices.push_back(currVertex);
+        }
+    }
+
+    void makeRingWithInputNormals(ew::MeshData& meshData, ew::Vec3 normalVec, float yPos, float radius, int numSegments) {
+        float thetaStep = ew::PI * 2 / numSegments;
+        for (int i = 0; i <= numSegments; i++) {
+            float theta = i * thetaStep;
+            ew::Vertex currVertex;
+            currVertex.pos.x = radius * cos(theta);
+            currVertex.pos.z = radius * sin(theta);
+            currVertex.pos.y = yPos;
+            currVertex.normal = normalVec;
+            currVertex.uv.x = (cos(theta) + 1) * 0.5;
+            currVertex.uv.y = (sin(theta) + 1) * 0.5;
+            meshData.vertices.push_back(currVertex);
+        }
     }
 
     ew::MeshData createPlane(float size, int numSegments){

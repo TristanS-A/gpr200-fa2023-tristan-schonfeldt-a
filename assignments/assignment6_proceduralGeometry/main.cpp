@@ -80,27 +80,33 @@ int main() {
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
 	//Create cube
-	ew::MeshData cubeMeshData = ew::createCube(0);
+	ew::MeshData cubeMeshData = ew::createCube(0.5);
 	ew::Mesh cubeMesh(cubeMeshData);
 
 	//Initialize transforms
 	ew::Transform cubeTransform;
 
     //New meshes
-    ew::MeshData planeMeshData = tsa::createPlane(0.5, 5);
+	int planeSubDiv = 5;
+    ew::MeshData planeMeshData = tsa::createPlane(0.5, planeSubDiv);
     ew::Mesh planeMesh(planeMeshData);
 
     ew::Transform planeTransform;
+	planeTransform.position = ew::Vec3(1, 0, 0);
 
-    ew::MeshData cylinderMeshData = tsa::createCylinder(0.5,0.2,40);
+	int cylinderSubDiv = 10;
+    ew::MeshData cylinderMeshData = tsa::createCylinder(0.5,0.2,cylinderSubDiv);
     ew::Mesh cylinderMesh(cylinderMeshData);
 
     ew::Transform cylinderTransform;
+	cylinderTransform.position = ew::Vec3(2, 0, 0);
 
-    ew::MeshData sphereMeshData = tsa::createSphere(0.5, 20);
+	int sphereSubDiv = 20;
+    ew::MeshData sphereMeshData = tsa::createSphere(0.5, sphereSubDiv);
     ew::Mesh sphereMesh(sphereMeshData);
 
     ew::Transform sphereTransform;
+	sphereTransform.position = ew::Vec3(3, 0, 0);
 
 	resetCamera(camera,cameraController);
 
@@ -138,7 +144,7 @@ int main() {
 
         //Draw Plane
         shader.setMat4("_Model", planeTransform.getModelMatrix());
-        //planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+        planeMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
         //Draw Cylinder
         shader.setMat4("_Model", cylinderTransform.getModelMatrix());
@@ -189,6 +195,26 @@ int main() {
 					glEnable(GL_CULL_FACE);
 				else
 					glDisable(GL_CULL_FACE);
+			}
+			if (ImGui::CollapsingHeader("Mesh Data")) {
+				if (ImGui::DragInt("Plane Subdevisions", &planeSubDiv, 1, 1, 300)) {
+					planeMeshData = tsa::createPlane(0.5, planeSubDiv);
+					planeMesh.load(planeMeshData);
+				}
+				if (ImGui::DragInt("Cylinder Subdevisions", &cylinderSubDiv, 1, 3, 300)) {
+					cylinderMeshData = tsa::createCylinder(0.5, 0.2, cylinderSubDiv);
+					cylinderMesh.load(cylinderMeshData);
+				}
+				if (ImGui::DragInt("Sphere Subdevisions", &sphereSubDiv, 1, 3, 300)) {
+					sphereMeshData = tsa::createSphere(0.5, sphereSubDiv);
+					sphereMesh.load(sphereMeshData);
+				}
+				ImGui::DragFloat3("Plane Position", &planeTransform.position.x, 0.1f);
+				ImGui::DragFloat3("Cylinder Position", &cylinderTransform.position.x, 0.1f);
+				ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
+				ImGui::DragFloat3("Plane Scale", &planeTransform.scale.x, 0.1f);
+				ImGui::DragFloat3("Cylinder Scale", &cylinderTransform.scale.x, 0.1f);
+				ImGui::DragFloat3("Sphere Scale", &sphereTransform.scale.x, 0.1f);
 			}
 			ImGui::End();
 			
