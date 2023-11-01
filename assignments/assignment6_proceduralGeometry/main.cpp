@@ -108,6 +108,13 @@ int main() {
     ew::Transform sphereTransform;
 	sphereTransform.position = ew::Vec3(3, 0, 0);
 
+    int torusSubDiv = 10;
+    ew::MeshData torusMeshData = tsa::createTorus(0.1, 0.3, torusSubDiv);
+    ew::Mesh torusMesh(torusMeshData);
+
+    ew::Transform torusTransform;
+    torusTransform.position = ew::Vec3(4, 0, 0);
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -153,6 +160,10 @@ int main() {
         //Draw sphere
         shader.setMat4("_Model", sphereTransform.getModelMatrix());
         sphereMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+        //Draw torus
+        shader.setMat4("_Model", torusTransform.getModelMatrix());
+        torusMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{

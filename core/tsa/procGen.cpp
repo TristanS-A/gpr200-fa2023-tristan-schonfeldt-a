@@ -7,6 +7,38 @@
 #include <iostream>
 
 namespace tsa{
+    ew::MeshData createTorus(float innerRadius, float outerRadius, int numSegments){
+        ew::MeshData newMesh;
+
+        float thetaStep = 2 * ew::PI / numSegments;
+        float phiStep = 2 * ew::PI / numSegments;
+
+        for (int i = 0; i <= numSegments; i++){
+            float theta = i * thetaStep;
+            for (int j = 0; j <= numSegments; j++){
+                float phi = j * phiStep;
+                ew::Vertex currVertex;
+                currVertex.pos.x = cos(theta) * (outerRadius + cos(phi) * innerRadius);
+                currVertex.pos.y = sin(theta) * (outerRadius + cos(phi) * innerRadius);
+                currVertex.pos.z = sin(phi) * innerRadius;
+                newMesh.vertices.push_back(currVertex);
+            }
+        }
+
+        for (int i = 0; i < numSegments; i++){
+            for (int j = 0; j <= numSegments; j++) {
+                newMesh.indices.push_back(i + (j * numSegments));
+                newMesh.indices.push_back(i + ((j + 1) * numSegments));
+                newMesh.indices.push_back(i + 1 + ((j + 1) * numSegments));
+                newMesh.indices.push_back(i + (j * numSegments));
+                newMesh.indices.push_back(i + + 1 + ((j + 1) * numSegments));
+                newMesh.indices.push_back(i + 1 + (j * numSegments));
+            }
+        }
+
+        return newMesh;
+    }
+
     ew::MeshData createSphere(float radius, int numSegments){
         ew::MeshData newMesh;
 
