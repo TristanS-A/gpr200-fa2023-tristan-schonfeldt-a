@@ -11,7 +11,7 @@ namespace tsa {
 
     ew::MeshData createCylinder(float height, float radius, int numSegments);
 
-    void makeRingWithSideNormals(ew::MeshData& meshData, float yPos, float radius, int numSegments);
+    void makeRingWithSideNormals(ew::MeshData& meshData, float yPos, float radius, int numSegments, float yUV);
 
     void makeRingWithInputNormals(ew::MeshData& meshData, ew::Vec3 normalVec, float yPos, float radius, int numSegments);
 

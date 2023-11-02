@@ -109,7 +109,9 @@ int main() {
 	sphereTransform.position = ew::Vec3(3, 0, 0);
 
     int torusSubDiv = 10;
-    ew::MeshData torusMeshData = tsa::createTorus(0.1, 0.3, torusSubDiv);
+    float innerRadius = 0.1;
+    float outerRadius = 0.3;
+    ew::MeshData torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
     ew::Mesh torusMesh(torusMeshData);
 
     ew::Transform torusTransform;
@@ -208,24 +210,38 @@ int main() {
 					glDisable(GL_CULL_FACE);
 			}
 			if (ImGui::CollapsingHeader("Mesh Data")) {
-				if (ImGui::DragInt("Plane Subdevisions", &planeSubDiv, 1, 1, 300)) {
+				if (ImGui::DragInt("Plane Subdivisions", &planeSubDiv, 1, 1, 300)) {
 					planeMeshData = tsa::createPlane(0.5, planeSubDiv);
 					planeMesh.load(planeMeshData);
 				}
-				if (ImGui::DragInt("Cylinder Subdevisions", &cylinderSubDiv, 1, 3, 300)) {
+				if (ImGui::DragInt("Cylinder Subdivisions", &cylinderSubDiv, 1, 3, 300)) {
 					cylinderMeshData = tsa::createCylinder(0.5, 0.2, cylinderSubDiv);
 					cylinderMesh.load(cylinderMeshData);
 				}
-				if (ImGui::DragInt("Sphere Subdevisions", &sphereSubDiv, 1, 3, 300)) {
+				if (ImGui::DragInt("Sphere Subdivisions", &sphereSubDiv, 1, 3, 300)) {
 					sphereMeshData = tsa::createSphere(0.5, sphereSubDiv);
 					sphereMesh.load(sphereMeshData);
 				}
+                if (ImGui::DragInt("Torus Subdivisions", &torusSubDiv, 1, 3, 300)) {
+                    torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                    torusMesh.load(torusMeshData);
+                }
+                if (ImGui::DragFloat("Torus Inner Radius", &innerRadius, 0.01, 0.001, 10)) {
+                    torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                    torusMesh.load(torusMeshData);
+                }
+                if (ImGui::DragFloat("Torus Outer Radius", &outerRadius, 0.01, 0.001, 10)) {
+                    torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                    torusMesh.load(torusMeshData);
+                }
 				ImGui::DragFloat3("Plane Position", &planeTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Cylinder Position", &cylinderTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
+				ImGui::DragFloat3("Torus Position", &torusTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Plane Scale", &planeTransform.scale.x, 0.1f);
 				ImGui::DragFloat3("Cylinder Scale", &cylinderTransform.scale.x, 0.1f);
 				ImGui::DragFloat3("Sphere Scale", &sphereTransform.scale.x, 0.1f);
+				ImGui::DragFloat3("Torus Scale", &torusTransform.scale.x, 0.1f);
 			}
 			ImGui::End();
 			

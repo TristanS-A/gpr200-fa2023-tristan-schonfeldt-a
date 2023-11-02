@@ -21,6 +21,8 @@ namespace tsa{
                 currVertex.pos.x = cos(theta) * (outerRadius + cos(phi) * innerRadius);
                 currVertex.pos.y = sin(theta) * (outerRadius + cos(phi) * innerRadius);
                 currVertex.pos.z = sin(phi) * innerRadius;
+                currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / numSegments);
+                currVertex.normal = ew::Normalize(ew::Vec3(cos(theta) * (cos(phi)), sin(theta) * (cos(phi)), sin(phi)));
                 newMesh.vertices.push_back(currVertex);
             }
         }
@@ -52,7 +54,7 @@ namespace tsa{
                 ew::Vertex currVertex;
                 currVertex.pos = ew::Vec3(radius * cos(theta) * sin(phi), radius * cos(phi), radius * sin(theta) * sin(phi));
                 currVertex.uv = ew::Vec2((float)col / numSegments, abs((float)row / numSegments - 1));
-                currVertex.normal = ew::Normalize(ew::Vec3(currVertex.pos.x, currVertex.pos.y, currVertex.pos.z));
+                currVertex.normal = ew::Normalize(ew::Vec3(currVertex.pos));
                 newMesh.vertices.push_back(currVertex);
             }
         }
@@ -101,9 +103,9 @@ namespace tsa{
 
         makeRingWithInputNormals(newMesh, ew::Vec3(0, 1, 0), topHeight, radius, numSegments);
 
-        makeRingWithSideNormals(newMesh, topHeight, radius, numSegments);
+        makeRingWithSideNormals(newMesh, topHeight, radius, numSegments, 1);
 
-        makeRingWithSideNormals(newMesh, bottomHeight, radius, numSegments);
+        makeRingWithSideNormals(newMesh, bottomHeight, radius, numSegments, 0);
 
         makeRingWithInputNormals(newMesh, ew::Vec3(0, -1, 0), bottomHeight, radius, numSegments);
 
@@ -141,7 +143,7 @@ namespace tsa{
         return newMesh;
     }
 
-    void makeRingWithSideNormals(ew::MeshData& meshData, float yPos, float radius, int numSegments) {
+    void makeRingWithSideNormals(ew::MeshData& meshData, float yPos, float radius, int numSegments, float yUV) {
         float thetaStep = ew::PI * 2 / numSegments;
         for (int i = 0; i <= numSegments; i++) {
             float theta = i * thetaStep;
@@ -151,7 +153,7 @@ namespace tsa{
             currVertex.pos.y = yPos;
             currVertex.normal = ew::Normalize(ew::Vec3(cos(theta), 0, sin(theta)));
             currVertex.uv.x = (cos(theta) + 1) * 0.5;
-            currVertex.uv.y = (sin(theta) + 1) * 0.5;
+            currVertex.uv.y = yUV;
             meshData.vertices.push_back(currVertex);
         }
     }
