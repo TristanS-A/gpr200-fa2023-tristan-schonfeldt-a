@@ -117,6 +117,13 @@ int main() {
     ew::Transform torusTransform;
     torusTransform.position = ew::Vec3(4, 0, 0);
 
+    int coneSubDiv = 10;
+    ew::MeshData coneMeshData = tsa::createCone(0.5, 0.3, coneSubDiv);
+    ew::Mesh coneMesh(coneMeshData);
+
+    ew::Transform coneTransform;
+    coneTransform.position = ew::Vec3(5, 0, 0);
+
 	resetCamera(camera,cameraController);
 
 	while (!glfwWindowShouldClose(window)) {
@@ -166,6 +173,10 @@ int main() {
         //Draw torus
         shader.setMat4("_Model", torusTransform.getModelMatrix());
         torusMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
+
+        //Draw torus
+        shader.setMat4("_Model", coneTransform.getModelMatrix());
+        coneMesh.draw((ew::DrawMode)appSettings.drawAsPoints);
 
 		//Render UI
 		{

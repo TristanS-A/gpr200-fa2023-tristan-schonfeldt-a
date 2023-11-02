@@ -204,4 +204,60 @@ namespace tsa{
 
         return newMesh;
     }
+
+    ew::MeshData createCone(float height, float radius, int numSegments){
+        ew::MeshData newMesh;
+
+        float newHeight = height / 2;
+        float thetaStep = ew::PI * 2 / numSegments;
+        for (int i = 0; i <= numSegments; i++){
+            float slice = (float)i / numSegments;
+            for (int j = 0; j <= numSegments; j++){
+                float theta = j * thetaStep;
+                ew::Vertex currVertex;
+                currVertex.pos.x = (radius * slice) * cos(theta);
+                currVertex.pos.z = (radius * slice) * sin(theta);
+                currVertex.pos.y = newHeight - 2 * (newHeight * (radius * slice / radius));
+                currVertex.normal = ew::Vec3(cos(theta), -radius / height, sin(theta));
+                currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / numSegments);
+                newMesh.vertices.push_back(currVertex);
+            }
+        }
+
+        makeRingWithInputNormals(newMesh, ew::Vec3(0, -1, 0), -newHeight, radius, numSegments);
+
+        ew::Vertex bottomCenter = {ew::Vec3(0, -newHeight, 0), ew::Vec3(0, -1, 0), ew::Vec2(0.5, 0.5)};
+        newMesh.vertices.push_back(bottomCenter);
+
+        int poleStart = 0;
+        int ringStart = numSegments + 1;
+        for (int i = 0; i < numSegments; i++){
+            newMesh.indices.push_back(ringStart + i);
+            newMesh.indices.push_back(poleStart + i);
+            newMesh.indices.push_back(ringStart + i + 1);
+        }
+
+        int columns = numSegments + 1;
+        for (int row = 1; row < numSegments; row++){
+            for (int col = 0; col < numSegments; col++){
+                int start = row * columns + col;
+                newMesh.indices.push_back(start);
+                newMesh.indices.push_back(start + 1);
+                newMesh.indices.push_back(start + columns + 1);
+                newMesh.indices.push_back(start + columns + 1);
+                newMesh.indices.push_back(start + columns);
+                newMesh.indices.push_back(start);
+            }
+        }
+
+        int start = (numSegments + 1) * (numSegments + 1);
+        int center = (numSegments + 1) * (numSegments + 1) + numSegments + 1;
+        for (int i = 0; i <= numSegments; i++){
+            newMesh.indices.push_back(start + i + 1);
+            newMesh.indices.push_back(center);
+            newMesh.indices.push_back(start + i);
+        }
+
+        return newMesh;
+    }
 }

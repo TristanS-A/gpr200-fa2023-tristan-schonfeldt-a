@@ -16,4 +16,6 @@ namespace tsa {
     void makeRingWithInputNormals(ew::MeshData& meshData, ew::Vec3 normalVec, float yPos, float radius, int numSegments);
 
     ew::MeshData createPlane(float size, int numSegments);
+
+    ew::MeshData createCone(float height, float radius, int numSegments);
 }
