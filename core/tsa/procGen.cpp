@@ -218,7 +218,7 @@ namespace tsa{
                 currVertex.pos.x = (radius * slice) * cos(theta);
                 currVertex.pos.z = (radius * slice) * sin(theta);
                 currVertex.pos.y = newHeight - 2 * (newHeight * (radius * slice / radius));
-                currVertex.normal = ew::Vec3(cos(theta), -radius / height, sin(theta));
+                currVertex.normal = ew::Normalize(ew::Vec3(cos(theta), radius / height, sin(theta)));
                 currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / numSegments);
                 newMesh.vertices.push_back(currVertex);
             }
