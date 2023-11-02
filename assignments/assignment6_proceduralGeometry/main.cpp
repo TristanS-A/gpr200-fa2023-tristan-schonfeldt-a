@@ -245,14 +245,20 @@ int main() {
                     torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
                     torusMesh.load(torusMeshData);
                 }
+                if (ImGui::DragInt("Cone Subdivisions", &coneSubDiv, 1, 3, 300)) {
+                    coneMeshData = tsa::createCone(0.5, 0.3, coneSubDiv);
+                    coneMesh.load(coneMeshData);
+                }
 				ImGui::DragFloat3("Plane Position", &planeTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Cylinder Position", &cylinderTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Torus Position", &torusTransform.position.x, 0.1f);
+				ImGui::DragFloat3("Cone Position", &coneTransform.position.x, 0.1f);
 				ImGui::DragFloat3("Plane Scale", &planeTransform.scale.x, 0.1f);
 				ImGui::DragFloat3("Cylinder Scale", &cylinderTransform.scale.x, 0.1f);
 				ImGui::DragFloat3("Sphere Scale", &sphereTransform.scale.x, 0.1f);
 				ImGui::DragFloat3("Torus Scale", &torusTransform.scale.x, 0.1f);
+				ImGui::DragFloat3("Cone Scale", &coneTransform.scale.x, 0.1f);
 			}
 			ImGui::End();
 			

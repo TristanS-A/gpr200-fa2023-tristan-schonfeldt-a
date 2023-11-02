@@ -210,6 +210,9 @@ namespace tsa{
 
         float newHeight = height / 2;
         float thetaStep = ew::PI * 2 / numSegments;
+
+        //My original horribly optimized cone design
+        /*
         for (int i = 0; i <= numSegments; i++){
             float slice = (float)i / numSegments;
             for (int j = 0; j <= numSegments; j++){
@@ -252,6 +255,40 @@ namespace tsa{
 
         int start = (numSegments + 1) * (numSegments + 1);
         int center = (numSegments + 1) * (numSegments + 1) + numSegments + 1;
+        for (int i = 0; i <= numSegments; i++){
+            newMesh.indices.push_back(start + i + 1);
+            newMesh.indices.push_back(center);
+            newMesh.indices.push_back(start + i);
+        }*/
+
+        for (int i = 0; i <= 1; i++){
+            for (int j = 0; j <= numSegments; j++){
+                float theta = j * thetaStep;
+                ew::Vertex currVertex;
+                currVertex.pos.x = (radius * i) * cos(theta);
+                currVertex.pos.z = (radius * i) * sin(theta);
+                currVertex.pos.y = newHeight - 2 * (newHeight * (radius * i / radius));
+                currVertex.normal = ew::Normalize(ew::Vec3((radius) * cos(theta) * (height / radius), radius /height , (radius) * sin(theta) * (height / radius)));
+                currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / 1);
+                newMesh.vertices.push_back(currVertex);
+            }
+        }
+
+        makeRingWithInputNormals(newMesh, ew::Vec3(0, -1, 0), -newHeight, radius, numSegments);
+
+        ew::Vertex bottomCenter = {ew::Vec3(0, -newHeight, 0), ew::Vec3(0, -1, 0), ew::Vec2(0.5, 0.5)};
+        newMesh.vertices.push_back(bottomCenter);
+
+        int poleStart = 0;
+        int ringStart = numSegments + 1;
+        for (int i = 0; i < numSegments; i++){
+            newMesh.indices.push_back(ringStart + i);
+            newMesh.indices.push_back(poleStart + i);
+            newMesh.indices.push_back(ringStart + i + 1);
+        }
+
+        int start = (numSegments + 1) * 2;
+        int center = (numSegments + 1) * 2 + numSegments + 1;
         for (int i = 0; i <= numSegments; i++){
             newMesh.indices.push_back(start + i + 1);
             newMesh.indices.push_back(center);
