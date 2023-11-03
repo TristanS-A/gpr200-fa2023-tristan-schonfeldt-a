@@ -261,14 +261,15 @@ namespace tsa{
             newMesh.indices.push_back(start + i);
         }*/
 
-        for (int i = 0; i <= 1; i++){
+        for (int i = 0; i <= 1; i++) {
             for (int j = 0; j <= numSegments; j++){
                 float theta = j * thetaStep;
                 ew::Vertex currVertex;
                 currVertex.pos.x = (radius * i) * cos(theta);
                 currVertex.pos.z = (radius * i) * sin(theta);
                 currVertex.pos.y = newHeight - 2 * (newHeight * (radius * i / radius));
-                currVertex.normal = ew::Normalize(ew::Vec3((radius) * cos(theta) * (height / radius), radius /height , (radius) * sin(theta) * (height / radius)));
+                ew::Vec3 posMag = ew::Magnitude(currVertex.pos);
+                currVertex.normal = ew::Normalize(ew::Vec3((radius) * cos(theta), radius , (radius) * sin(theta)));
                 currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / 1);
                 newMesh.vertices.push_back(currVertex);
             }
