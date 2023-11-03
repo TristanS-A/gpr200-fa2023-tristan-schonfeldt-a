@@ -297,4 +297,97 @@ namespace tsa{
 
         return newMesh;
     }
+
+    ew::MeshData createSpring(float height, int numCoils, float outerRadius, float innerRadius, int numSegments){
+        ew::MeshData newMesh;
+
+
+        float thetaStep = 2 * ew::PI / numSegments;
+        float phiStep = 2 * ew::PI / numSegments;
+        float coilStep = (height / numCoils) / numSegments;
+        float top = height / 2;
+        float newHeight = top;
+
+        ew::Vertex topCenter = {ew::Vec3(outerRadius, newHeight, 0), ew::Vec3(0, 0, 1), ew::Vec2(0.5, 0.5)};
+        newMesh.vertices.push_back(topCenter);
+
+        for (int j = 0; j <= numSegments; j++) {
+            float phi = j * phiStep;
+            ew::Vertex currVertex;
+            currVertex.pos.x = cos(0) * (outerRadius + cos(phi) * innerRadius);
+            currVertex.pos.y = sin(phi) * innerRadius + newHeight;
+            currVertex.pos.z = sin(0) * (outerRadius + cos(phi) * innerRadius);
+            currVertex.uv = ew::Vec2((cos(phi) + 1) * 0.5, (sin(phi) + 1) * 0.5);
+            currVertex.normal = ew::Normalize(
+                    ew::Vec3(0, 0, 1));
+            newMesh.vertices.push_back(currVertex);
+        }
+
+        for (int coils = 1; coils <= numCoils; coils++) {
+            for (int i = 0; i <= numSegments; i++) {
+                float theta = i * thetaStep;
+                newHeight -= coilStep * (i > 0); //This counts as branch less programming right :)
+                for (int j = 0; j <= numSegments; j++) {
+                    float phi = j * phiStep;
+                    ew::Vertex currVertex;
+                    currVertex.pos.x = cos(theta) * (outerRadius + cos(phi) * innerRadius);
+                    currVertex.pos.y = sin(phi) * innerRadius + newHeight;
+                    currVertex.pos.z = sin(theta) * (outerRadius + cos(phi) * innerRadius);
+                    currVertex.uv = ew::Vec2((float) j / numSegments, (float) i / numSegments);
+                    currVertex.normal = ew::Normalize(
+                            ew::Vec3(cos(theta) * (cos(phi)), (sin(phi)), sin(theta) * (cos(phi))));
+                    newMesh.vertices.push_back(currVertex);
+                }
+            }
+        }
+
+        for (int j = 0; j <= numSegments; j++) {
+            float phi = j * phiStep;
+            ew::Vertex currVertex;
+            currVertex.pos.x = cos(0) * (outerRadius + cos(phi) * innerRadius);
+            currVertex.pos.y = sin(phi) * innerRadius + newHeight;
+            currVertex.pos.z = sin(0) * (outerRadius + cos(phi) * innerRadius);
+            currVertex.uv = ew::Vec2((cos(phi) + 1) * 0.5, (sin(phi) + 1) * 0.5);
+            currVertex.normal = ew::Normalize(
+                    ew::Vec3(0, 0, 1));
+            newMesh.vertices.push_back(currVertex);
+        }
+
+        ew::Vertex bottomCenter = {ew::Vec3(outerRadius, -top, 0), ew::Vec3(0, 0, 1), ew::Vec2(0.5, 0.5)};
+        newMesh.vertices.push_back(bottomCenter);
+
+        int start = 1;
+        int center = 0;
+        for (int i = 0; i <= numSegments; i++){
+            newMesh.indices.push_back(start + i);
+            newMesh.indices.push_back(center);
+            newMesh.indices.push_back(start + i + 1);
+        }
+
+        start = numSegments + 2;
+        int columns = (numSegments + 1) * (numSegments + 1);
+        for (int coils = 0; coils < numCoils; coils++) {
+            float begin = coils * columns + start;
+            for (int i = 0; i < numSegments; i++) {
+                for (int j = 0; j <= numSegments; j++) {
+                    newMesh.indices.push_back(begin + i + 1 + ((j + 1) * numSegments));
+                    newMesh.indices.push_back(begin + i + ((j + 1) * numSegments));
+                    newMesh.indices.push_back(begin + i + (j * numSegments));
+                    newMesh.indices.push_back(begin + i + 1 + (j * numSegments));
+                    newMesh.indices.push_back(begin + i + +1 + ((j + 1) * numSegments));
+                    newMesh.indices.push_back(begin + i + (j * numSegments));
+                }
+            }
+        }
+
+        start = (numSegments + 1) * (numSegments + 1) * numCoils + numSegments + 1;
+        center = (numSegments + 1) * (numSegments + 1) * numCoils + numSegments * 2 + 3;
+        for (int i = 0; i <= numSegments; i++){
+            newMesh.indices.push_back(start + i + 1);
+            newMesh.indices.push_back(center);
+            newMesh.indices.push_back(start + i);
+        }
+
+        return newMesh;
+    }
 }
