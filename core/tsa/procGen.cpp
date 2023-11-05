@@ -281,9 +281,7 @@ namespace tsa{
                 ew::Vertex currVertex;
                 currVertex.pos.x = (radius * i) * cos(theta);
                 currVertex.pos.z = (radius * i) * sin(theta);
-                currVertex.pos.y = newHeight - 2 * (newHeight * (radius * i / radius));
-                ew::Vec3 posMag = ew::Magnitude(currVertex.pos);
-                currVertex.normal = ew::Normalize(ew::Vec3((radius) * cos(theta), radius , (radius) * sin(theta)));
+                currVertex.pos.y = newHeight - 2 * (newHeight * i);
                 currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / 1);
                 newMesh.vertices.push_back(currVertex);
             }
@@ -293,6 +291,15 @@ namespace tsa{
 
         ew::Vertex bottomCenter = {ew::Vec3(0, -newHeight, 0), ew::Vec3(0, -1, 0), ew::Vec2(0.5, 0.5)};
         newMesh.vertices.push_back(bottomCenter);
+
+        for (int i = 0; i <= numSegments; i++){
+            ew::Vertex currVertex = newMesh.vertices[i];
+            ew::Vertex nextVertex = newMesh.vertices[numSegments + 1 + i];
+            ew::Vec3 newNormal = currVertex.pos - nextVertex.pos;
+            newNormal = ew::Vec3(-newNormal.x, newNormal.y, -newNormal.z);
+            newMesh.vertices[i].normal = newNormal;
+            newMesh.vertices[numSegments + 1 + i].normal = newNormal;
+        }
 
         int poleStart = 0;
         int ringStart = numSegments + 1;
@@ -313,20 +320,20 @@ namespace tsa{
         return newMesh;
     }
 
-    ew::MeshData createSpring(float height, int numCoils, float outerRadius, float innerRadius, int numSegments){
+    ew::MeshData createSpring(float height, int numCoils, float outerRadius, float innerRadius, int stackSubDiv, int sliceSubDiv){
         ew::MeshData newMesh;
 
 
-        float thetaStep = 2 * ew::PI / numSegments;
-        float phiStep = 2 * ew::PI / numSegments;
-        float coilStep = (height / numCoils) / numSegments;
+        float thetaStep = 2 * ew::PI / stackSubDiv;
+        float phiStep = 2 * ew::PI / sliceSubDiv;
+        float coilStep = (height / numCoils) / stackSubDiv;
         float top = height / 2;
         float newHeight = top;
 
         ew::Vertex topCenter = {ew::Vec3(outerRadius, newHeight, 0), ew::Vec3(0, 0, 1), ew::Vec2(0.5, 0.5)};
         newMesh.vertices.push_back(topCenter);
 
-        for (int j = 0; j <= numSegments; j++) {
+        for (int j = 0; j <= sliceSubDiv; j++) {
             float phi = j * phiStep;
             ew::Vertex currVertex;
             currVertex.pos.x = cos(0) * (outerRadius + cos(phi) * innerRadius);
@@ -339,16 +346,16 @@ namespace tsa{
         }
 
         for (int coils = 1; coils <= numCoils; coils++) {
-            for (int i = 0; i <= numSegments; i++) {
+            for (int i = 0; i <= stackSubDiv; i++) {
                 float theta = i * thetaStep;
                 newHeight -= coilStep * (i > 0); //This counts as branch less programming right :)
-                for (int j = 0; j <= numSegments; j++) {
+                for (int j = 0; j <= sliceSubDiv; j++) {
                     float phi = j * phiStep;
                     ew::Vertex currVertex;
                     currVertex.pos.x = cos(theta) * (outerRadius + cos(phi) * innerRadius);
                     currVertex.pos.y = sin(phi) * innerRadius + newHeight;
                     currVertex.pos.z = sin(theta) * (outerRadius + cos(phi) * innerRadius);
-                    currVertex.uv = ew::Vec2((float) j / numSegments, (float) i / numSegments);
+                    currVertex.uv = ew::Vec2((float) j / sliceSubDiv, (float) i / stackSubDiv);
                     currVertex.normal = ew::Normalize(
                             ew::Vec3(cos(theta) * (cos(phi)), (sin(phi)), sin(theta) * (cos(phi))));
                     newMesh.vertices.push_back(currVertex);
@@ -356,7 +363,7 @@ namespace tsa{
             }
         }
 
-        for (int j = 0; j <= numSegments; j++) {
+        for (int j = 0; j <= sliceSubDiv; j++) {
             float phi = j * phiStep;
             ew::Vertex currVertex;
             currVertex.pos.x = cos(0) * (outerRadius + cos(phi) * innerRadius);
@@ -373,31 +380,31 @@ namespace tsa{
 
         int start = 1;
         int center = 0;
-        for (int i = 0; i <= numSegments; i++){
+        for (int i = 0; i <= sliceSubDiv; i++){
             newMesh.indices.push_back(start + i);
             newMesh.indices.push_back(center);
             newMesh.indices.push_back(start + i + 1);
         }
 
-        start = numSegments + 2;
-        int columns = (numSegments + 1) * (numSegments + 1);
+        start = sliceSubDiv + 2;
+        int columns = (stackSubDiv + 1) * (sliceSubDiv + 1);
         for (int coils = 0; coils < numCoils; coils++) {
             float begin = coils * columns + start;
-            for (int i = 0; i < numSegments; i++) {
-                for (int j = 0; j <= numSegments; j++) {
-                    newMesh.indices.push_back(begin + i + 1 + ((j + 1) * numSegments));
-                    newMesh.indices.push_back(begin + i + ((j + 1) * numSegments));
-                    newMesh.indices.push_back(begin + i + (j * numSegments));
-                    newMesh.indices.push_back(begin + i + 1 + (j * numSegments));
-                    newMesh.indices.push_back(begin + i + +1 + ((j + 1) * numSegments));
-                    newMesh.indices.push_back(begin + i + (j * numSegments));
+            for (int i = 0; i < stackSubDiv; i++) {
+                for (int j = 0; j < sliceSubDiv; j++) {
+                    newMesh.indices.push_back(begin + j + 1 + ((i + 1) * (sliceSubDiv + 1)));
+                    newMesh.indices.push_back(begin + j + ((i + 1) * (sliceSubDiv + 1)));
+                    newMesh.indices.push_back(begin + j + (i * (sliceSubDiv + 1)));
+                    newMesh.indices.push_back(begin + j + 1 + (i * (sliceSubDiv + 1)));
+                    newMesh.indices.push_back(begin + j + +1 + ((i + 1) * (sliceSubDiv + 1)));
+                    newMesh.indices.push_back(begin + j + (i * (sliceSubDiv + 1)));
                 }
             }
         }
 
-        start = (numSegments + 1) * (numSegments + 1) * numCoils + numSegments + 1;
-        center = (numSegments + 1) * (numSegments + 1) * numCoils + numSegments * 2 + 3;
-        for (int i = 0; i <= numSegments; i++){
+        start = (stackSubDiv + 1) * (sliceSubDiv + 1) * numCoils + sliceSubDiv + 1;
+        center = (stackSubDiv + 1) * (sliceSubDiv + 1) * numCoils + sliceSubDiv * 2 + 3;
+        for (int i = 0; i <= sliceSubDiv; i++){
             newMesh.indices.push_back(start + i + 1);
             newMesh.indices.push_back(center);
             newMesh.indices.push_back(start + i);

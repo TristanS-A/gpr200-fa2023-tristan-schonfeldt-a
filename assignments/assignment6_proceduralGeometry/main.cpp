@@ -125,12 +125,13 @@ int main() {
     ew::Transform coneTransform;
     coneTransform.position = ew::Vec3(5, 0, 0);
 
-    int springSubDiv = 10;
+    int springStackSubDiv = 10;
+    int springSliceSubDiv = 10;
     float springInnerRadius = 0.1;
     float springOuterRadius = 0.2;
     float springHeight = 1;
     int springCoils = 3;
-    ew::MeshData springMeshData = tsa::createSpring(springHeight, springCoils, outerRadius, innerRadius, springSubDiv);
+    ew::MeshData springMeshData = tsa::createSpring(springHeight, springCoils, outerRadius, innerRadius, springStackSubDiv, springSliceSubDiv);
     ew::Mesh springMesh(springMeshData);
 
     ew::Transform springTransform;
@@ -290,29 +291,34 @@ int main() {
                     ImGui::DragFloat3("Cone Scale", &coneTransform.scale.x, 0.1f);
                 }
                 if (ImGui::CollapsingHeader("Spring Data")) {
-                    if (ImGui::DragInt("Spring Subdivisions", &springSubDiv, 1, 3, 300)) {
+                    if (ImGui::DragInt("Spring Stack Subdivisions", &springStackSubDiv, 1, 3, 300)) {
                         springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
-                                                           springInnerRadius, springSubDiv);
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
+                        springMesh.load(springMeshData);
+                    }
+                    if (ImGui::DragInt("Spring Slice Subdivisions", &springSliceSubDiv, 1, 3, 300)) {
+                        springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
                         springMesh.load(springMeshData);
                     }
                     if (ImGui::DragInt("Spring Coils", &springCoils, 1, 1, 50)) {
                         springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
-                                                           springInnerRadius, springSubDiv);
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
                         springMesh.load(springMeshData);
                     }
                     if (ImGui::DragFloat("Spring Height", &springHeight, 0.1, 0.01, 50)) {
                         springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
-                                                           springInnerRadius, springSubDiv);
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
                         springMesh.load(springMeshData);
                     }
                     if (ImGui::DragFloat("Spring Inner Radius", &springInnerRadius, 0.1, 0.1, 50)) {
                         springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
-                                                           springInnerRadius, springSubDiv);
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
                         springMesh.load(springMeshData);
                     }
                     if (ImGui::DragFloat("Spring Outer Radius", &springOuterRadius, 0.1, 0.1, 50)) {
                         springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius,
-                                                           springInnerRadius, springSubDiv);
+                                                           springInnerRadius, springStackSubDiv, springSliceSubDiv);
                         springMesh.load(springMeshData);
                     }
                     ImGui::DragFloat3("Spring Position", &springTransform.position.x, 0.1f);

@@ -19,5 +19,5 @@ namespace tsa {
 
     ew::MeshData createCone(float height, float radius, int numSegments);
 
-    ew::MeshData createSpring(float height, int numCoils, float outerRadius, float innerRadius, int numSegments);
+    ew::MeshData createSpring(float height, int numCoils, float outerRadius, float innerRadius, int stackSubDiv, int sliceSubDiv);
 }
