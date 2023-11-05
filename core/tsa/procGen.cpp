@@ -7,40 +7,54 @@
 #include <iostream>
 
 namespace tsa{
-    ew::MeshData createTorus(float innerRadius, float outerRadius, int numSegments){
+    ew::MeshData createTorus(float innerRadius, float outerRadius, int stackSubDiv, int sliceSubDiv){
         ew::MeshData newMesh;
 
-        float thetaStep = 2 * ew::PI / numSegments;
-        float phiStep = 2 * ew::PI / numSegments;
+        float thetaStep = 2 * ew::PI / stackSubDiv;
+        float phiStep = 2 * ew::PI / sliceSubDiv;
 
-        for (int i = 0; i <= numSegments; i++){
+        for (int i = 0; i <= stackSubDiv; i++){
             float theta = i * thetaStep;
-            for (int j = 0; j <= numSegments; j++){
+            for (int j = 0; j <= sliceSubDiv; j++){
                 float phi = j * phiStep;
                 ew::Vertex currVertex;
                 currVertex.pos.x = cos(theta) * (outerRadius + cos(phi) * innerRadius);
                 currVertex.pos.y = sin(theta) * (outerRadius + cos(phi) * innerRadius);
                 currVertex.pos.z = sin(phi) * innerRadius;
-                currVertex.uv = ew::Vec2((float)j / numSegments, (float)i / numSegments);
+                currVertex.uv = ew::Vec2((float)j / sliceSubDiv, (float)i / stackSubDiv);
                 currVertex.normal = ew::Normalize(ew::Vec3(cos(theta) * (cos(phi)), sin(theta) * (cos(phi)), sin(phi)));
                 newMesh.vertices.push_back(currVertex);
             }
         }
 
-        for (int i = 0; i < numSegments; i++){
-            for (int j = 0; j <= numSegments; j++) {
-                newMesh.indices.push_back(i + (j * numSegments));
-                newMesh.indices.push_back(i + ((j + 1) * numSegments));
-                newMesh.indices.push_back(i + 1 + ((j + 1) * numSegments));
-                newMesh.indices.push_back(i + (j * numSegments));
-                newMesh.indices.push_back(i + + 1 + ((j + 1) * numSegments));
-                newMesh.indices.push_back(i + 1 + (j * numSegments));
+        int start = sliceSubDiv + 1;
+        for (int st = 0; st < stackSubDiv; st++){
+            for (int sl= 0; sl< sliceSubDiv; sl++) {
+                newMesh.indices.push_back(sl + (st * start));
+                newMesh.indices.push_back(sl + ((st + 1) * start));
+                newMesh.indices.push_back(sl + 1 + ((st+ 1) * start));
+                newMesh.indices.push_back(sl + (st * start));
+                newMesh.indices.push_back(sl + + 1 + ((st + 1) * start));
+                newMesh.indices.push_back(sl + 1 + (st * start));
             }
         }
-
+        /*
+        for (int st = 0; st < stack; st++) {
+            for (int sl = 0; sl < slice; sl++) {
+                int i1 = sl + (st * start);
+                int i2 = (sl + 1) + (st * start);
+                int i3 = sl + ((st + 1) * start);
+                int i4 = (sl + 1) + ((st + 1) * start);
+                newMesh.indices.push_back(i1);
+                newMesh.indices.push_back(i3);
+                newMesh.indices.push_back(i4);
+                newMesh.indices.push_back(i1);
+                newMesh.indices.push_back(i4);
+                newMesh.indices.push_back(i2);
+            }
+        }*/
         return newMesh;
     }
-
     ew::MeshData createSphere(float radius, int numSegments){
         ew::MeshData newMesh;
 

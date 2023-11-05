@@ -5,7 +5,7 @@
 #include "../ew/mesh.h"
 
 namespace tsa {
-    ew::MeshData createTorus(float innerRadius, float outerRadius, int numSegments);
+    ew::MeshData createTorus(float innerRadius, float outerRadius, int stackSubDiv, int sliceSubDiv);
 
     ew::MeshData createSphere(float radius, int numSegments);
 

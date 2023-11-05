@@ -108,10 +108,11 @@ int main() {
     ew::Transform sphereTransform;
 	sphereTransform.position = ew::Vec3(3, 0, 0);
 
-    int torusSubDiv = 10;
+    int stackSubDiv = 10;
+    int sliceSubDiv = 10;
     float innerRadius = 0.1;
     float outerRadius = 0.3;
-    ew::MeshData torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+    ew::MeshData torusMeshData = tsa::createTorus(innerRadius, outerRadius, stackSubDiv, sliceSubDiv);
     ew::Mesh torusMesh(torusMeshData);
 
     ew::Transform torusTransform;
@@ -261,16 +262,20 @@ int main() {
                     ImGui::DragFloat3("Sphere Scale", &sphereTransform.scale.x, 0.1f);
                 }
                 if (ImGui::CollapsingHeader("Torus Data")) {
-                    if (ImGui::DragInt("Torus Subdivisions", &torusSubDiv, 1, 3, 300)) {
-                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                    if (ImGui::DragInt("Torus Stack Subdivisions", &stackSubDiv, 1, 3, 300)) {
+                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, stackSubDiv, sliceSubDiv);
+                        torusMesh.load(torusMeshData);
+                    }
+                    if (ImGui::DragInt("Torus Slice Subdivisions", &sliceSubDiv, 1, 3, 300)) {
+                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, stackSubDiv, sliceSubDiv);
                         torusMesh.load(torusMeshData);
                     }
                     if (ImGui::DragFloat("Torus Inner Radius", &innerRadius, 0.01, 0.001, 10)) {
-                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, stackSubDiv, sliceSubDiv);
                         torusMesh.load(torusMeshData);
                     }
                     if (ImGui::DragFloat("Torus Outer Radius", &outerRadius, 0.01, 0.001, 10)) {
-                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, torusSubDiv);
+                        torusMeshData = tsa::createTorus(innerRadius, outerRadius, stackSubDiv, sliceSubDiv);
                         torusMesh.load(torusMeshData);
                     }
                     ImGui::DragFloat3("Torus Position", &torusTransform.position.x, 0.1f);
