@@ -131,7 +131,7 @@ int main() {
     float springOuterRadius = 0.2;
     float springHeight = 1;
     int springCoils = 3;
-    ew::MeshData springMeshData = tsa::createSpring(springHeight, springCoils, outerRadius, innerRadius, springStackSubDiv, springSliceSubDiv);
+    ew::MeshData springMeshData = tsa::createSpring(springHeight, springCoils, springOuterRadius, springInnerRadius, springStackSubDiv, springSliceSubDiv);
     ew::Mesh springMesh(springMeshData);
 
     ew::Transform springTransform;
