@@ -124,6 +124,7 @@ int main() {
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
+		//shader.setMat4("_NewModelMatrix", ew::macubeTransform.getModelMatrix());
 		cubeMesh.draw();
 
 		shader.setMat4("_Model", planeTransform.getModelMatrix());

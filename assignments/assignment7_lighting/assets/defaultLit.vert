@@ -10,6 +10,7 @@ out Surface{
 }vs_out;
 
 uniform mat4 _Model;
+uniform vec3 _NWorldVec;
 uniform mat4 _ViewProjection;
 
 void main(){
