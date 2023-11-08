@@ -15,6 +15,8 @@
 #include <ew/camera.h>
 #include <ew/cameraController.h>
 
+#define MAX_LIGHTS 1
+
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 
@@ -26,6 +28,18 @@ ew::Vec3 bgColor = ew::Vec3(0.1f);
 
 ew::Camera camera;
 ew::CameraController cameraController;
+
+struct Light {
+    ew::Vec3 position;
+    ew::Vec3 color;
+};
+
+struct Material {
+    float ambientK;
+    float diffuseK;
+    float shininess;
+    float specular;
+};
 
 int main() {
 	printf("Initializing...");
@@ -61,6 +75,8 @@ int main() {
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
+    ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
+
 	//Create cube
 	ew::Mesh cubeMesh(ew::createCube(1.0f));
 	ew::Mesh planeMesh(ew::createPlane(5.0f, 5.0f, 10));
@@ -77,6 +93,14 @@ int main() {
 	cylinderTransform.position = ew::Vec3(1.5f, 0.0f, 0.0f);
 
 	resetCamera(camera,cameraController);
+
+    //Create lights
+    Light lights[MAX_LIGHTS] = {
+            Light {ew::Vec3(1.0, 1.0, 1.0), ew::Vec3(1.0, 0.0, 1.0)}
+    };
+    ew::Mesh sphereLightMesh(ew::createSphere(0.2f, 64));
+    ew::Transform sphereLightTransform;
+    sphereLightTransform.position = ew::Vec3(1.0f, 1.0f, 1.0f);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -111,6 +135,17 @@ int main() {
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
 		cylinderMesh.draw();
 
+        //Drawing Lights
+        shader.setVec3("_Lights[0].position", lights[0].position);
+        shader.setVec3("_Lights[0].color",lights[0].color);
+        sphereLightTransform.position = lights[0].position;
+
+        lightShader.use();
+        lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+        lightShader.setMat4("_Model", sphereLightTransform.getModelMatrix());
+        lightShader.setVec3("_Color", lights[0].color);
+        sphereLightMesh.draw();
+
 		//TODO: Render point lights
 
 		//Render UI
@@ -140,6 +175,7 @@ int main() {
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
+            ImGui::DragFloat3("Light Position", &lights[0].position.x, 0.1f);
 			ImGui::End();
 			
 			ImGui::Render();
