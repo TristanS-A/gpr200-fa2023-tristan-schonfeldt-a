@@ -136,9 +136,11 @@ int main() {
 		cylinderMesh.draw();
 
         //Drawing Lights
+        //ew::Vec4 lightWorldPos = sphereLightTransform.getModelMatrix() * ew::Vec4(lights[0].position, 1.0);
+        //lights[0].position = ew::Vec3(lightWorldPos.x, lightWorldPos.y, lightWorldPos.z);
+        lights[0].position = sphereLightTransform.position;
         shader.setVec3("_Lights[0].position", lights[0].position);
         shader.setVec3("_Lights[0].color",lights[0].color);
-        sphereLightTransform.position = lights[0].position;
 
         lightShader.use();
         lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
@@ -175,7 +177,9 @@ int main() {
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
-            ImGui::DragFloat3("Light Position", &lights[0].position.x, 0.1f);
+            ImGui::DragFloat3("Light Position", &sphereLightTransform.position.x, 0.1f);
+            ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
+            ImGui::DragFloat3("Sphere Rotation", &sphereTransform.rotation.x, 0.1f);
 			ImGui::End();
 			
 			ImGui::Render();
