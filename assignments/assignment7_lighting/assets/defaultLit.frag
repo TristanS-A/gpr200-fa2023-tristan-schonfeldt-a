@@ -12,15 +12,29 @@ struct Light {
 	vec3 color;
 };
 
-#define MAX_LIGHTS 1
-uniform Light _Lights[1];
+struct Material {
+	float ambientK;
+	float diffuseK;
+	float shininess;
+	float specular;
+};
+
+#define MAX_LIGHTS 2
+uniform Light _Lights[MAX_LIGHTS];
 uniform sampler2D _Texture;
+uniform vec3 _CamPos;
+uniform Material _Mat;
 
 void main(){
 	vec3 newNormals = normalize(fs_in.WorldNormals);
 	vec3 lightColor = vec3(0.0f, 0.0f, 0.0f);
+	vec3 camToFragVec = _CamPos - fs_in.WorldPos;
 	for (int i = 0; i < MAX_LIGHTS; i++){
-		lightColor += _Lights[i].color * max(dot(newNormals, normalize(_Lights[i].position - fs_in.WorldPos)), 0);
+		vec3 lightToFragVec = _Lights[i].position - fs_in.WorldPos;
+		vec3 halfVecPart = lightToFragVec + camToFragVec;
+		lightColor += _Lights[i].color * _Mat.ambientK;
+		lightColor += _Lights[i].color * _Mat.diffuseK * max(dot(newNormals, normalize(lightToFragVec)), 0);
+		lightColor += _Lights[i].color * _Mat.specular * pow(max(dot(newNormals, normalize(halfVecPart / halfVecPart.length())), 0), _Mat.shininess);
 	}
 	vec4 newColor = texture(_Texture,fs_in.UV);
 	FragColor = vec4(newColor.rgb * lightColor, 1.0);

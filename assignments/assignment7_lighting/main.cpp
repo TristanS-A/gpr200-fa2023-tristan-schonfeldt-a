@@ -15,7 +15,7 @@
 #include <ew/camera.h>
 #include <ew/cameraController.h>
 
-#define MAX_LIGHTS 1
+#define MAX_LIGHTS 2
 
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
@@ -94,13 +94,24 @@ int main() {
 
 	resetCamera(camera,cameraController);
 
+    //Create materials for meshes
+    Material cubeMat = {0, 1, 9, 1};
+    Material planeMat = {0, 1, 9, 1};
+    Material sphereMat = {0, 1, 9, 1};
+    Material cylinderMat = {0, 1, 9, 1};
+
     //Create lights
     Light lights[MAX_LIGHTS] = {
-            Light {ew::Vec3(1.0, 1.0, 1.0), ew::Vec3(1.0, 0.0, 1.0)}
+            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(1.0, 0.0, 0.0)},
+            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.0, 0.0, 1.0)}
     };
-    ew::Mesh sphereLightMesh(ew::createSphere(0.2f, 64));
-    ew::Transform sphereLightTransform;
-    sphereLightTransform.position = ew::Vec3(1.0f, 1.0f, 1.0f);
+    ew::Mesh sphereLightMesh1(ew::createSphere(0.2f, 64));
+    ew::Transform sphereLightTransform1;
+    sphereLightTransform1.position = ew::Vec3(1.0f, 1.0f, 1.0f);
+
+    ew::Mesh sphereLightMesh2(ew::createSphere(0.2f, 64));
+    ew::Transform sphereLightTransform2;
+    sphereLightTransform2.position = ew::Vec3(-1.0f, 1.0f, 1.0f);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -121,33 +132,58 @@ int main() {
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
 		shader.setInt("_Texture", 0);
 		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+        shader.setVec3("_CamPos", camera.position);
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
 		//shader.setMat4("_NewModelMatrix", ew::macubeTransform.getModelMatrix());
+        shader.setFloat("_Mat.ambientK", cubeMat.ambientK);
+        shader.setFloat("_Mat.diffuseK", cubeMat.diffuseK);
+        shader.setFloat("_Mat.shininess", cubeMat.shininess);
+        shader.setFloat("_Mat.specular", cubeMat.specular);
 		cubeMesh.draw();
 
 		shader.setMat4("_Model", planeTransform.getModelMatrix());
+        shader.setFloat("_Mat.ambientK", planeMat.ambientK);
+        shader.setFloat("_Mat.diffuseK", planeMat.diffuseK);
+        shader.setFloat("_Mat.shininess", planeMat.shininess);
+        shader.setFloat("_Mat.specular", planeMat.specular);
 		planeMesh.draw();
 
 		shader.setMat4("_Model", sphereTransform.getModelMatrix());
+        shader.setFloat("_Mat.ambientK", sphereMat.ambientK);
+        shader.setFloat("_Mat.diffuseK", sphereMat.diffuseK);
+        shader.setFloat("_Mat.shininess", sphereMat.shininess);
+        shader.setFloat("_Mat.specular", sphereMat.specular);
 		sphereMesh.draw();
 
 		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
+        shader.setFloat("_Mat.ambientK", cylinderMat.ambientK);
+        shader.setFloat("_Mat.diffuseK", cylinderMat.diffuseK);
+        shader.setFloat("_Mat.shininess", cylinderMat.shininess);
+        shader.setFloat("_Mat.specular", cylinderMat.specular);
 		cylinderMesh.draw();
 
         //Drawing Lights
         //ew::Vec4 lightWorldPos = sphereLightTransform.getModelMatrix() * ew::Vec4(lights[0].position, 1.0);
         //lights[0].position = ew::Vec3(lightWorldPos.x, lightWorldPos.y, lightWorldPos.z);
-        lights[0].position = sphereLightTransform.position;
-        shader.setVec3("_Lights[0].position", lights[0].position);
-        shader.setVec3("_Lights[0].color",lights[0].color);
+        lights[0].position = sphereLightTransform1.position;
+        lights[1].position = sphereLightTransform2.position;
+        for (int i = 0; i < MAX_LIGHTS; i++) {
+            shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
+            shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
+        }
 
         lightShader.use();
         lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
-        lightShader.setMat4("_Model", sphereLightTransform.getModelMatrix());
+
+        lightShader.setMat4("_Model", sphereLightTransform1.getModelMatrix());
         lightShader.setVec3("_Color", lights[0].color);
-        sphereLightMesh.draw();
+        sphereLightMesh1.draw();
+
+        lightShader.setMat4("_Model", sphereLightTransform2.getModelMatrix());
+        lightShader.setVec3("_Color", lights[1].color);
+        sphereLightMesh2.draw();
 
 		//TODO: Render point lights
 
@@ -178,7 +214,7 @@ int main() {
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
-            ImGui::DragFloat3("Light Position", &sphereLightTransform.position.x, 0.1f);
+            ImGui::DragFloat3("Light Position", &sphereLightTransform1.position.x, 0.1f);
             ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
             ImGui::DragFloat3("Sphere Rotation", &sphereTransform.rotation.x, 0.1f);
 			ImGui::End();
