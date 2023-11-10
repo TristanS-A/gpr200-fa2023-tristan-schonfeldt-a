@@ -15,13 +15,15 @@
 #include <ew/camera.h>
 #include <ew/cameraController.h>
 
-#define MAX_LIGHTS 2
-
 void framebufferSizeCallback(GLFWwindow* window, int width, int height);
 void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 
 int SCREEN_WIDTH = 1080;
 int SCREEN_HEIGHT = 720;
+
+#define MAX_LIGHTS 2
+
+int currMaxLights = 2;
 
 float prevTime;
 ew::Vec3 bgColor = ew::Vec3(0.1f);
@@ -95,23 +97,24 @@ int main() {
 	resetCamera(camera,cameraController);
 
     //Create materials for meshes
-    Material cubeMat = {0, 1, 9, 1};
-    Material planeMat = {0, 1, 9, 1};
-    Material sphereMat = {0, 1, 9, 1};
-    Material cylinderMat = {0, 1, 9, 1};
+    Material cubeMat = {0, 1, 50, 1};
+    Material planeMat = {0, 1, 50, 1};
+    Material sphereMat = {0, 1, 50, 1};
+    Material cylinderMat = {0, 1, 50, 1};
 
     //Create lights
     Light lights[MAX_LIGHTS] = {
-            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(1.0, 0.0, 0.0)},
-            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.0, 0.0, 1.0)}
+            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.5, 0.0, 1.0)},
+            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.0, 1.0, 0.0)}
     };
+
+	ew::Transform lightTransforms[MAX_LIGHTS];
+
     ew::Mesh sphereLightMesh1(ew::createSphere(0.2f, 64));
-    ew::Transform sphereLightTransform1;
-    sphereLightTransform1.position = ew::Vec3(1.0f, 1.0f, 1.0f);
+	lightTransforms[0].position = ew::Vec3(1.0f, 1.0f, 1.0f);
 
     ew::Mesh sphereLightMesh2(ew::createSphere(0.2f, 64));
-    ew::Transform sphereLightTransform2;
-    sphereLightTransform2.position = ew::Vec3(-1.0f, 1.0f, 1.0f);
+    lightTransforms[1].position = ew::Vec3(-1.0f, 1.0f, 1.0f);
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -136,7 +139,7 @@ int main() {
 
 		//Draw shapes
 		shader.setMat4("_Model", cubeTransform.getModelMatrix());
-		//shader.setMat4("_NewModelMatrix", ew::macubeTransform.getModelMatrix());
+		//shader.setMat4("_NWorldVec", ew::macubeTransform.getModelMatrix());
         shader.setFloat("_Mat.ambientK", cubeMat.ambientK);
         shader.setFloat("_Mat.diffuseK", cubeMat.diffuseK);
         shader.setFloat("_Mat.shininess", cubeMat.shininess);
@@ -165,11 +168,10 @@ int main() {
 		cylinderMesh.draw();
 
         //Drawing Lights
-        //ew::Vec4 lightWorldPos = sphereLightTransform.getModelMatrix() * ew::Vec4(lights[0].position, 1.0);
-        //lights[0].position = ew::Vec3(lightWorldPos.x, lightWorldPos.y, lightWorldPos.z);
-        lights[0].position = sphereLightTransform1.position;
-        lights[1].position = sphereLightTransform2.position;
-        for (int i = 0; i < MAX_LIGHTS; i++) {
+		shader.setInt("_CurrMaxLights", currMaxLights);
+		lights[0].position = lightTransforms[0].position;
+        lights[1].position = lightTransforms[1].position;
+        for (int i = 0; i < currMaxLights; i++) {
             shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
             shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
         }
@@ -177,11 +179,11 @@ int main() {
         lightShader.use();
         lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
 
-        lightShader.setMat4("_Model", sphereLightTransform1.getModelMatrix());
+        lightShader.setMat4("_Model", lightTransforms[0].getModelMatrix());
         lightShader.setVec3("_Color", lights[0].color);
         sphereLightMesh1.draw();
 
-        lightShader.setMat4("_Model", sphereLightTransform2.getModelMatrix());
+        lightShader.setMat4("_Model", lightTransforms[1].getModelMatrix());
         lightShader.setVec3("_Color", lights[1].color);
         sphereLightMesh2.draw();
 
@@ -214,7 +216,9 @@ int main() {
 			}
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
-            ImGui::DragFloat3("Light Position", &sphereLightTransform1.position.x, 0.1f);
+			ImGui::DragInt("Number of Lights", &currMaxLights, 1, 0, MAX_LIGHTS);
+            ImGui::DragFloat3("Light Position", &lightTransforms[0].position.x, 0.1f);
+            ImGui::ColorEdit3("Light Color", &lights[0].color.x, 0.1f);
             ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
             ImGui::DragFloat3("Sphere Rotation", &sphereTransform.rotation.x, 0.1f);
 			ImGui::End();
