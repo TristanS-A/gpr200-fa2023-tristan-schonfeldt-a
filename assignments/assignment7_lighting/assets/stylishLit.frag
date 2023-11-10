@@ -29,9 +29,12 @@ uniform int _BlinnPhong;
 
 float getLightEQ(vec3 newNormals, vec3 lightToFragVec, vec3 halfVecPart, vec3 camToFragVec){
 	float lightVal = _Mat.ambientK;
-	lightVal += _Mat.diffuseK * int(max(dot(newNormals, lightToFragVec), 0) > 0);
-	
-	lightVal += int(max(dot(newNormals, normalize(halfVecPart / halfVecPart.length())), 0) > 0.99) * _BlinnPhong;
+
+	//My attempt at trying to make kindof basic cel-shading without any looking up of stuff because finding stuff is hard
+	lightVal += _Mat.diffuseK * int(max(dot(newNormals, lightToFragVec), 0) > 0.0f);
+
+	//Could not figure out how to do specular
+	//lightVal += _Mat.diffuseK * int(pow(max(dot(newNormals, normalize(halfVecPart / halfVecPart.length())), 0), _Mat.shininess) > 0.1f) * _BlinnPhong;
 
 	return lightVal;
 }

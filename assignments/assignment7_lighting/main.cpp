@@ -27,6 +27,7 @@ int currMaxLights = 5;
 
 bool blinnPhong = true;
 bool gauraudShading = false;
+bool stylizedShading = false;
 
 float prevTime;
 ew::Vec3 bgColor = ew::Vec3(0.1f);
@@ -80,7 +81,7 @@ int main() {
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
 	ew::Shader gouraudShader("assets/gouraudLit.vert", "assets/gouraudLit.frag");
 	ew::Shader stylishShader("assets/defaultLit.vert", "assets/stylishLit.frag");
-    ew::Shader currLitShader = stylishShader;
+    ew::Shader currLitShader = shader;
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
     ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
@@ -116,7 +117,7 @@ int main() {
     lights[1] = {ew::Vec3(-2.0f, 1.0f, 2.0f), ew::Vec3(0.0, 1.0, 0.0)};
     lights[2] = {ew::Vec3(2.0f, 1.0f, -2.0f), ew::Vec3(1.0, 0.0, 0.0)};
     lights[3] = {ew::Vec3(-2.0f, 1.0f, -2.0f), ew::Vec3(0.0, 0.0, 1.0)};
-    lights[4] = {ew::Vec3(0.0f, 2.0f, 0.0f), ew::Vec3(1.0, 1.0, 1.0)};
+    lights[4] = {ew::Vec3(0.0f, 2.0f, 0.0f), ew::Vec3(0.0, 1.0, 1.0)};
 
     for (int i = 0; i < MAX_LIGHTS; i++){
         lightTransforms[i].position = lights[i].position;
@@ -226,16 +227,66 @@ int main() {
             ImGui::Checkbox("Blinn-Phong", &blinnPhong);
             if (ImGui::Checkbox("Gouraud Shading", &gauraudShading)){
                 if (gauraudShading){
+                    stylizedShading = false;
                     currLitShader = gouraudShader;
                 }
                 else{
-                    currLitShader = shader;
+                    if (stylizedShading){
+                        currLitShader = stylishShader;
+                    }
+                    else{
+                        currLitShader = shader;
+                    }
                 }
             }
-            ImGui::DragFloat3("Light Position", &lightTransforms[0].position.x, 0.1f);
-            ImGui::ColorEdit3("Light Color", &lights[0].color.x, 0.1f);
-            ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
-            ImGui::DragFloat3("Sphere Rotation", &sphereTransform.rotation.x, 0.1f);
+            if (ImGui::Checkbox("Epic Stylized Shading", &stylizedShading)){
+                if (stylizedShading){
+                    gauraudShading = false;
+                    currLitShader = stylishShader;
+                }
+                else{
+                    if (gauraudShading){
+                        currLitShader = gouraudShader;
+                    }
+                    else{
+                        currLitShader = shader;
+                    }
+                }
+            }
+            if (ImGui::CollapsingHeader("Lights")) {
+                for (int i = 0; i < currMaxLights; i++) {
+                    if (ImGui::CollapsingHeader(("Light " + std::to_string(i + 1)).c_str())) {
+                        ImGui::DragFloat3("Light Position", &lightTransforms[i].position.x, 0.1f);
+                        ImGui::ColorEdit3("Light Color", &lights[i].color.x);
+                    }
+                }
+            }
+            if (ImGui::CollapsingHeader("Mesh Materials")) {
+                if (ImGui::CollapsingHeader("Cube Material")) {
+                    ImGui::DragFloat("Diffuse K", &cubeMat.diffuseK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Ambient K", &cubeMat.ambientK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Shininess K", &cubeMat.shininess, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Specular K", &cubeMat.specular, 0.1f, 0.0, 1000);
+                }
+                if (ImGui::CollapsingHeader("Cylinder Material")) {
+                    ImGui::DragFloat("Diffuse K", &cylinderMat.diffuseK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Ambient K", &cylinderMat.ambientK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Shininess K", &cylinderMat.shininess, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Specular K", &cylinderMat.specular, 0.1f, 0.0, 1000);
+                }
+                if (ImGui::CollapsingHeader("Sphere Material")) {
+                    ImGui::DragFloat("Diffuse K", &sphereMat.diffuseK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Ambient K", &sphereMat.ambientK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Shininess K", &sphereMat.shininess, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Specular K", &sphereMat.specular, 0.1f, 0.0, 1000);
+                }
+                if (ImGui::CollapsingHeader("Plane Material")) {
+                    ImGui::DragFloat("Diffuse K", &planeMat.diffuseK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Ambient K", &planeMat.ambientK, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Shininess K", &planeMat.shininess, 0.1f, 0.0, 1000);
+                    ImGui::DragFloat("Specular K", &planeMat.specular, 0.1f, 0.0, 1000);
+                }
+            }
 			ImGui::End();
 			
 			ImGui::Render();
