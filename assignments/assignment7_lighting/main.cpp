@@ -103,18 +103,17 @@ int main() {
     Material cylinderMat = {0, 1, 50, 1};
 
     //Create lights
-    Light lights[MAX_LIGHTS] = {
-            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.5, 0.0, 1.0)},
-            Light {ew::Vec3(0.0, 0.0, 0.0), ew::Vec3(0.0, 1.0, 0.0)}
-    };
-
+    Light lights[MAX_LIGHTS];
 	ew::Transform lightTransforms[MAX_LIGHTS];
 
-    ew::Mesh sphereLightMesh1(ew::createSphere(0.2f, 64));
-	lightTransforms[0].position = ew::Vec3(1.0f, 1.0f, 1.0f);
+    lights[0] = {ew::Vec3(1.0f, 1.0f, 1.0f), ew::Vec3(0.5, 0.0, 1.0)};
+    lights[1] = {ew::Vec3(-1.0f, 1.0f, 1.0f), ew::Vec3(0.0, 1.0, 0.0)};
 
-    ew::Mesh sphereLightMesh2(ew::createSphere(0.2f, 64));
-    lightTransforms[1].position = ew::Vec3(-1.0f, 1.0f, 1.0f);
+    for (int i = 0; i < MAX_LIGHTS; i++){
+        lightTransforms[i].position = lights[i].position;
+    }
+
+    ew::Mesh lightMesh(ew::createSphere(0.2f, 64));
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -169,9 +168,9 @@ int main() {
 
         //Drawing Lights
 		shader.setInt("_CurrMaxLights", currMaxLights);
-		lights[0].position = lightTransforms[0].position;
-        lights[1].position = lightTransforms[1].position;
-        for (int i = 0; i < currMaxLights; i++) {
+
+        for (int i = 0; i < currMaxLights; i++){
+            lights[i].position = lightTransforms[i].position;
             shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
             shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
         }
@@ -179,15 +178,11 @@ int main() {
         lightShader.use();
         lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
 
-        lightShader.setMat4("_Model", lightTransforms[0].getModelMatrix());
-        lightShader.setVec3("_Color", lights[0].color);
-        sphereLightMesh1.draw();
-
-        lightShader.setMat4("_Model", lightTransforms[1].getModelMatrix());
-        lightShader.setVec3("_Color", lights[1].color);
-        sphereLightMesh2.draw();
-
-		//TODO: Render point lights
+        for (int i = 0; i < currMaxLights; i++) {
+            lightShader.setMat4("_Model", lightTransforms[i].getModelMatrix());
+            lightShader.setVec3("_Color", lights[i].color);
+            lightMesh.draw();
+        }
 
 		//Render UI
 		{
