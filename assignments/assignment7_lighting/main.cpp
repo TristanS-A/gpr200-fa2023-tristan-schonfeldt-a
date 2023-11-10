@@ -21,9 +21,12 @@ void resetCamera(ew::Camera& camera, ew::CameraController& cameraController);
 int SCREEN_WIDTH = 1080;
 int SCREEN_HEIGHT = 720;
 
-#define MAX_LIGHTS 2
+#define MAX_LIGHTS 5
 
-int currMaxLights = 2;
+int currMaxLights = 5;
+
+bool blinnPhong = true;
+bool gauraudShading = false;
 
 float prevTime;
 ew::Vec3 bgColor = ew::Vec3(0.1f);
@@ -75,6 +78,8 @@ int main() {
 	glEnable(GL_DEPTH_TEST);
 
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
+	ew::Shader gouraudShader("assets/gouraudLit.vert", "assets/gouraudLit.frag");
+    ew::Shader currLitShader = shader;
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
     ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
@@ -106,8 +111,11 @@ int main() {
     Light lights[MAX_LIGHTS];
 	ew::Transform lightTransforms[MAX_LIGHTS];
 
-    lights[0] = {ew::Vec3(1.0f, 1.0f, 1.0f), ew::Vec3(0.5, 0.0, 1.0)};
-    lights[1] = {ew::Vec3(-1.0f, 1.0f, 1.0f), ew::Vec3(0.0, 1.0, 0.0)};
+    lights[0] = {ew::Vec3(2.0f, 1.0f, 2.0f), ew::Vec3(0.5, 0.0, 1.0)};
+    lights[1] = {ew::Vec3(-2.0f, 1.0f, 2.0f), ew::Vec3(0.0, 1.0, 0.0)};
+    lights[2] = {ew::Vec3(2.0f, 1.0f, -2.0f), ew::Vec3(1.0, 0.0, 0.0)};
+    lights[3] = {ew::Vec3(-2.0f, 1.0f, -2.0f), ew::Vec3(0.0, 0.0, 1.0)};
+    lights[4] = {ew::Vec3(0.0f, 2.0f, 0.0f), ew::Vec3(1.0, 1.0, 1.0)};
 
     for (int i = 0; i < MAX_LIGHTS; i++){
         lightTransforms[i].position = lights[i].position;
@@ -130,54 +138,57 @@ int main() {
 		glClearColor(bgColor.x, bgColor.y,bgColor.z,1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		shader.use();
+		currLitShader.use();
 		glBindTexture(GL_TEXTURE_2D, brickTexture);
-		shader.setInt("_Texture", 0);
-		shader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
-        shader.setVec3("_CamPos", camera.position);
+		currLitShader.setInt("_Texture", 0);
+		currLitShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
+        currLitShader.setVec3("_CamPos", camera.position);
+        currLitShader.setInt("_BlinnPhong", blinnPhong);
 
 		//Draw shapes
-		shader.setMat4("_Model", cubeTransform.getModelMatrix());
-		//shader.setMat4("_NWorldVec", ew::macubeTransform.getModelMatrix());
-        shader.setFloat("_Mat.ambientK", cubeMat.ambientK);
-        shader.setFloat("_Mat.diffuseK", cubeMat.diffuseK);
-        shader.setFloat("_Mat.shininess", cubeMat.shininess);
-        shader.setFloat("_Mat.specular", cubeMat.specular);
+		currLitShader.setMat4("_Model", cubeTransform.getModelMatrix());
+		//currLitShader.setMat4("_NWorldVec", ew::macubeTransform.getModelMatrix());
+        currLitShader.setFloat("_Mat.ambientK", cubeMat.ambientK);
+        currLitShader.setFloat("_Mat.diffuseK", cubeMat.diffuseK);
+        currLitShader.setFloat("_Mat.shininess", cubeMat.shininess);
+        currLitShader.setFloat("_Mat.specular", cubeMat.specular);
 		cubeMesh.draw();
 
-		shader.setMat4("_Model", planeTransform.getModelMatrix());
-        shader.setFloat("_Mat.ambientK", planeMat.ambientK);
-        shader.setFloat("_Mat.diffuseK", planeMat.diffuseK);
-        shader.setFloat("_Mat.shininess", planeMat.shininess);
-        shader.setFloat("_Mat.specular", planeMat.specular);
+		currLitShader.setMat4("_Model", planeTransform.getModelMatrix());
+        currLitShader.setFloat("_Mat.ambientK", planeMat.ambientK);
+        currLitShader.setFloat("_Mat.diffuseK", planeMat.diffuseK);
+        currLitShader.setFloat("_Mat.shininess", planeMat.shininess);
+        currLitShader.setFloat("_Mat.specular", planeMat.specular);
 		planeMesh.draw();
 
-		shader.setMat4("_Model", sphereTransform.getModelMatrix());
-        shader.setFloat("_Mat.ambientK", sphereMat.ambientK);
-        shader.setFloat("_Mat.diffuseK", sphereMat.diffuseK);
-        shader.setFloat("_Mat.shininess", sphereMat.shininess);
-        shader.setFloat("_Mat.specular", sphereMat.specular);
+		currLitShader.setMat4("_Model", sphereTransform.getModelMatrix());
+        currLitShader.setFloat("_Mat.ambientK", sphereMat.ambientK);
+        currLitShader.setFloat("_Mat.diffuseK", sphereMat.diffuseK);
+        currLitShader.setFloat("_Mat.shininess", sphereMat.shininess);
+        currLitShader.setFloat("_Mat.specular", sphereMat.specular);
 		sphereMesh.draw();
 
-		shader.setMat4("_Model", cylinderTransform.getModelMatrix());
-        shader.setFloat("_Mat.ambientK", cylinderMat.ambientK);
-        shader.setFloat("_Mat.diffuseK", cylinderMat.diffuseK);
-        shader.setFloat("_Mat.shininess", cylinderMat.shininess);
-        shader.setFloat("_Mat.specular", cylinderMat.specular);
+		currLitShader.setMat4("_Model", cylinderTransform.getModelMatrix());
+        currLitShader.setFloat("_Mat.ambientK", cylinderMat.ambientK);
+        currLitShader.setFloat("_Mat.diffuseK", cylinderMat.diffuseK);
+        currLitShader.setFloat("_Mat.shininess", cylinderMat.shininess);
+        currLitShader.setFloat("_Mat.specular", cylinderMat.specular);
 		cylinderMesh.draw();
 
         //Drawing Lights
-		shader.setInt("_CurrMaxLights", currMaxLights);
+		currLitShader.setInt("_CurrMaxLights", currMaxLights);
 
+        //Assign light data to lit meshes
         for (int i = 0; i < currMaxLights; i++){
             lights[i].position = lightTransforms[i].position;
-            shader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
-            shader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
+            currLitShader.setVec3("_Lights[" + std::to_string(i) + "].position", lights[i].position);
+            currLitShader.setVec3("_Lights[" + std::to_string(i) + "].color", lights[i].color);
         }
 
         lightShader.use();
         lightShader.setMat4("_ViewProjection", camera.ProjectionMatrix() * camera.ViewMatrix());
 
+        //Assign data to light meshes
         for (int i = 0; i < currMaxLights; i++) {
             lightShader.setMat4("_Model", lightTransforms[i].getModelMatrix());
             lightShader.setVec3("_Color", lights[i].color);
@@ -212,6 +223,15 @@ int main() {
 
 			ImGui::ColorEdit3("BG color", &bgColor.x);
 			ImGui::DragInt("Number of Lights", &currMaxLights, 1, 0, MAX_LIGHTS);
+            ImGui::Checkbox("Blinn-Phong", &blinnPhong);
+            if (ImGui::Checkbox("Gouraud Shading", &gauraudShading)){
+                if (gauraudShading){
+                    currLitShader = gouraudShader;
+                }
+                else{
+                    currLitShader = shader;
+                }
+            }
             ImGui::DragFloat3("Light Position", &lightTransforms[0].position.x, 0.1f);
             ImGui::ColorEdit3("Light Color", &lights[0].color.x, 0.1f);
             ImGui::DragFloat3("Sphere Position", &sphereTransform.position.x, 0.1f);
