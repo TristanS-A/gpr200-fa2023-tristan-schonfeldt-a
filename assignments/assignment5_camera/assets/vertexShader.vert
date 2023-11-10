@@ -7,5 +7,5 @@ uniform mat4 _MVP;
 
 void main(){
 	Normal = vNormal;
-	gl_Position = _MVP * vec4(vPos,1.0);
+	gl_Position = vec4(vPos,1.0);
 }

@@ -79,7 +79,8 @@ int main() {
 
 	ew::Shader shader("assets/defaultLit.vert", "assets/defaultLit.frag");
 	ew::Shader gouraudShader("assets/gouraudLit.vert", "assets/gouraudLit.frag");
-    ew::Shader currLitShader = shader;
+	ew::Shader stylishShader("assets/defaultLit.vert", "assets/stylishLit.frag");
+    ew::Shader currLitShader = stylishShader;
 	unsigned int brickTexture = ew::loadTexture("assets/brick_color.jpg",GL_REPEAT,GL_LINEAR);
 
     ew::Shader lightShader("assets/unlit.vert", "assets/unlit.frag");
@@ -147,8 +148,7 @@ int main() {
 
 		//Draw shapes
 		currLitShader.setMat4("_Model", cubeTransform.getModelMatrix());
-		//currLitShader.setMat4("_NWorldVec", ew::macubeTransform.getModelMatrix());
-        currLitShader.setFloat("_Mat.ambientK", cubeMat.ambientK);
+		currLitShader.setFloat("_Mat.ambientK", cubeMat.ambientK);
         currLitShader.setFloat("_Mat.diffuseK", cubeMat.diffuseK);
         currLitShader.setFloat("_Mat.shininess", cubeMat.shininess);
         currLitShader.setFloat("_Mat.specular", cubeMat.specular);
