@@ -121,9 +121,8 @@ int main() {
 
     for (int i = 0; i < MAX_LIGHTS; i++){
         lightTransforms[i].position = lights[i].position;
+        lightTransforms[i].scale = ew::Vec3(0.5, 0.5, 0.5);
     }
-
-    ew::Mesh lightMesh(ew::createSphere(0.2f, 64));
 
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
@@ -193,7 +192,7 @@ int main() {
         for (int i = 0; i < currMaxLights; i++) {
             lightShader.setMat4("_Model", lightTransforms[i].getModelMatrix());
             lightShader.setVec3("_Color", lights[i].color);
-            lightMesh.draw();
+            sphereMesh.draw();
         }
 
 		//Render UI
